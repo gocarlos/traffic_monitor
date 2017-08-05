@@ -1,4 +1,4 @@
-// Blob.cpp
+// (c) 2017 Vigilatore
 
 #include "traffic_monitor/Blob.h"
 

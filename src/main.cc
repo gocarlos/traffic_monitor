@@ -1,23 +1,19 @@
-// main.cpp
-// Supply video name on the command line. Filename, no full path, as this will
-// break the log file path! (because I didn't do it properly!)
+// (c) 2017 Vigilatore
+
+#include <stdio.h>
+#include <ctime>
+#include <fstream>
+#include <iostream>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <iostream>
-#include <stdio.h>
-//#include<conio.h>		// it may be necessary to change or remove this
-// line if not using Windows
-#include <ctime>   // timestamp stuff
-#include <fstream> // file utils
-
 #include "traffic_monitor/Blob.h"
 
-#define SHOW_STEPS // un-comment or comment this line to show steps or not
+#define SHOW_STEPS  // un-comment or comment this line to show steps or not
 
-#define FRAME_SCALE 1 // divide frame dimentions by this number
+#define FRAME_SCALE 1  // divide frame dimentions by this number
 
 // global variables
 // ///////////////////////////////////////////////////////////////////////////////
@@ -50,9 +46,10 @@ void drawCarCountOnImage(int &carCountL, int &carCountR,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[]) {
+  google::InitGoogleLogging(argv[0]);
 
   cv::VideoCapture capVideo;
-  std::ofstream myfile; // log file
+  std::ofstream myfile;  // log file
 
   cv::Mat imgFrame1;
   cv::Mat imgFrame2;
@@ -67,30 +64,25 @@ int main(int argc, char *argv[]) {
   int carCountR = 0;
 
   // capVideo.open("../movie.mp4");
-  capVideo.open(1);
+  std::size_t num_cameras{0};
+  for (std::size_t i = 0; i < 5; ++i) {
+    capVideo.open(i);
+    if (!capVideo.isOpened()) {
+      ++num_cameras;
+    }
+    if (num_cameras > 0) {
+      LOG(INFO) << "There are " << num_cameras
+                << " available. \nTaking the first one";
+    }
+    // TODO(gocarlos) choose the camera or video here.
+    capVideo.open(0);
+  }
 
-  // log file
   myfile.open("../logging/OpenCV-" + std::to_string(time(0)) + ".txt");
   std::cout << "Logging to: \"/tmp/OpenCV-"
             << "-" << std::to_string(time(0)) << ".txt\"" << std::endl;
 
   myfile << "\"Timestamp\",\"Left\",\"Right\"" << std::endl;
-
-  if (!capVideo.isOpened()) { // if unable to open video file
-    std::cout << "error reading video file" << std::endl
-              << std::endl; // show error message
-    //_getch();
-    // it may be necessary to change or remove
-    // this line if not using Windows
-    return (0); // and exit program
-  }
-
-  // if (capVideo.get(CV_CAP_PROP_FRAME_COUNT) < 2) {
-  //     std::cout << "error: video file must have at least two frames";
-  //     //_getch();                   // it may be necessary to change or
-  //     remove this line if not using Windows
-  //     return(0);
-  // }
 
   capVideo.read(imgFrame1L);
   capVideo.read(imgFrame2L);
@@ -119,7 +111,6 @@ int main(int argc, char *argv[]) {
   int frameCount = 2;
 
   while (capVideo.isOpened() && chCheckForEscKey != 27) {
-
     std::vector<Blob> currentFrameBlobs;
 
     cv::Mat imgFrame1Copy = imgFrame1.clone();
@@ -200,9 +191,9 @@ int main(int argc, char *argv[]) {
 
     drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
 
-    imgFrame2Copy = imgFrame2.clone(); // get another copy of frame 2 since we
-                                       // changed the previous frame 2 copy in
-                                       // the processing above
+    imgFrame2Copy = imgFrame2.clone();  // get another copy of frame 2 since we
+                                        // changed the previous frame 2 copy in
+                                        // the processing above
 
     drawBlobInfoOnImage(blobs, imgFrame2Copy);
 
@@ -230,7 +221,7 @@ int main(int argc, char *argv[]) {
 
     currentFrameBlobs.clear();
 
-    imgFrame1 = imgFrame2.clone(); // move frame 1 up to where frame 2 is
+    imgFrame1 = imgFrame2.clone();  // move frame 1 up to where frame 2 is
 
     // if ((capVideo.get(CV_CAP_PROP_POS_FRAMES) + 1) <
     //     capVideo.get(CV_CAP_PROP_FRAME_COUNT)) {
@@ -251,10 +242,10 @@ int main(int argc, char *argv[]) {
     chCheckForEscKey = cv::waitKey(1);
   }
 
-  if (chCheckForEscKey != 27) { // if the user did not press esc (i.e. we
-                                // reached the end of the video)
-    cv::waitKey(
-        0); // hold the windows open to allow the "end of video" message to show
+  if (chCheckForEscKey != 27) {  // if the user did not press esc (i.e. we
+                                 // reached the end of the video)
+    cv::waitKey(0);  // hold the windows open to allow the "end of video"
+                     // message to show
   }
   // note that if the user did press esc, we don't need to hold the windows
   // open, we can simply let the program end which will close the windows
@@ -265,23 +256,18 @@ int main(int argc, char *argv[]) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void matchCurrentFrameBlobsToExistingBlobs(
     std::vector<Blob> &existingBlobs, std::vector<Blob> &currentFrameBlobs) {
-
   for (auto &existingBlob : existingBlobs) {
-
     existingBlob.blnCurrentMatchFoundOrNewBlob = false;
 
     existingBlob.predictNextPosition();
   }
 
   for (auto &currentFrameBlob : currentFrameBlobs) {
-
     int intIndexOfLeastDistance = 0;
     double dblLeastDistance = 100000.0;
 
     for (unsigned int i = 0; i < existingBlobs.size(); i++) {
-
       if (existingBlobs[i].blnStillBeingTracked == true) {
-
         double dblDistance =
             distanceBetweenPoints(currentFrameBlob.centerPositions.back(),
                                   existingBlobs[i].predictedNextPosition);
@@ -302,7 +288,6 @@ void matchCurrentFrameBlobsToExistingBlobs(
   }
 
   for (auto &existingBlob : existingBlobs) {
-
     if (existingBlob.blnCurrentMatchFoundOrNewBlob == false) {
       existingBlob.intNumOfConsecutiveFramesWithoutAMatch++;
     }
@@ -316,7 +301,6 @@ void matchCurrentFrameBlobsToExistingBlobs(
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void addBlobToExistingBlobs(Blob &currentFrameBlob,
                             std::vector<Blob> &existingBlobs, int &intIndex) {
-
   existingBlobs[intIndex].currentContour = currentFrameBlob.currentContour;
   existingBlobs[intIndex].currentBoundingRect =
       currentFrameBlob.currentBoundingRect;
@@ -335,7 +319,6 @@ void addBlobToExistingBlobs(Blob &currentFrameBlob,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void addNewBlob(Blob &currentFrameBlob, std::vector<Blob> &existingBlobs) {
-
   currentFrameBlob.blnCurrentMatchFoundOrNewBlob = true;
 
   existingBlobs.push_back(currentFrameBlob);
@@ -343,7 +326,6 @@ void addNewBlob(Blob &currentFrameBlob, std::vector<Blob> &existingBlobs) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 double distanceBetweenPoints(cv::Point point1, cv::Point point2) {
-
   int intX = abs(point1.x - point2.x);
   int intY = abs(point1.y - point2.y);
 
@@ -364,7 +346,6 @@ void drawAndShowContours(cv::Size imageSize,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
                          std::string strImageName) {
-
   cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
 
   std::vector<std::vector<cv::Point>> contours;
@@ -387,7 +368,6 @@ bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
   bool blnAtLeastOneBlobCrossedTheLine = 0;
 
   for (auto blob : blobs) {
-
     if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
       int prevFrameIndex = (int)blob.centerPositions.size() - 2;
       int currFrameIndex = (int)blob.centerPositions.size() - 1;
@@ -423,9 +403,7 @@ bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawBlobInfoOnImage(std::vector<Blob> &blobs, cv::Mat &imgFrame2Copy) {
-
   for (unsigned int i = 0; i < blobs.size(); i++) {
-
     if (blobs[i].blnStillBeingTracked == true) {
       cv::rectangle(imgFrame2Copy, blobs[i].currentBoundingRect, SCALAR_RED, 2);
 
@@ -443,7 +421,6 @@ void drawBlobInfoOnImage(std::vector<Blob> &blobs, cv::Mat &imgFrame2Copy) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void drawCarCountOnImage(int &carCountL, int &carCountR,
                          cv::Mat &imgFrame2Copy) {
-
   int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
   double dblFontScale = (imgFrame2Copy.rows * imgFrame2Copy.cols) / 300000.0;
   int intFontThickness = (int)std::round(dblFontScale * 1.5);

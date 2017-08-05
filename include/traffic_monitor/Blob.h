@@ -1,4 +1,5 @@
-// Blob.h
+// (c) 2017 Vigilatore
+
 
 #ifndef MY_BLOB
 #define MY_BLOB
@@ -6,6 +7,8 @@
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
 #include<opencv2/imgproc/imgproc.hpp>
+
+#include <glog/logging.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Blob {

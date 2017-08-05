@@ -1,5 +1,14 @@
 build/
 
+
+.cproject
+.project
+
+
+CMakeFiles/
+CMakeCache.txt
+
+
 # Prerequisites
 *.d
 
