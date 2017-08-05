@@ -1,9 +1,4 @@
-/*
- * drawer.h
- *
- *  Created on: Aug 5, 2017
- *      Author: gocarlos
- */
+// (c) 2017 Vigilatore
 
 #ifndef INCLUDE_TRAFFIC_MONITOR_DRAWER_H_
 #define INCLUDE_TRAFFIC_MONITOR_DRAWER_H_
@@ -22,17 +17,17 @@ class Drawer {
   Drawer();
   virtual ~Drawer();
 
-  static void drawBlobInfoOnImage(std::vector<Blob> &blobs,
+  static void DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                                   cv::Mat &imgFrame2Copy);
 
-  static void drawCarCountOnImage(int &carCountL, int &carCountR,
+  static void DrawCarCountOnImage(int &carCountL, int &carCountR,
                                   cv::Mat &imgFrame2Copy);
 
-  static void drawAndShowContours(cv::Size imageSize,
+  static void DrawAndShowContours(cv::Size imageSize,
                                   std::vector<std::vector<cv::Point>> contours,
                                   std::string strImageName);
 
-  static void drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
+  static void DrawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
                                   std::string strImageName);
 };
 

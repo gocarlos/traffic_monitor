@@ -1,9 +1,4 @@
-/*
- * Tools.cc
- *
- *  Created on: Aug 5, 2017
- *      Author: gocarlos
- */
+// (c) 2017 Vigilatore
 
 #include <traffic_monitor/tools.h>
 
@@ -31,13 +26,14 @@ bool Tools::checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
   bool blnAtLeastOneBlobCrossedTheLine = 0;
 
   for (auto blob : blobs) {
-    if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
-      int prevFrameIndex = (int)blob.centerPositions.size() - 2;
-      int currFrameIndex = (int)blob.centerPositions.size() - 1;
+    if (blob.blnStillBeingTracked == true &&
+        blob.center_positions_.size() >= 2) {
+      int prevFrameIndex = (int)blob.center_positions_.size() - 2;
+      int currFrameIndex = (int)blob.center_positions_.size() - 1;
 
       // going left
-      if (blob.centerPositions[prevFrameIndex].x > intVerticalLinePosition &&
-          blob.centerPositions[currFrameIndex].x <= intVerticalLinePosition) {
+      if (blob.center_positions_[prevFrameIndex].x > intVerticalLinePosition &&
+          blob.center_positions_[currFrameIndex].x <= intVerticalLinePosition) {
         carCountL++;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
@@ -48,8 +44,8 @@ bool Tools::checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
       }
 
       // going right
-      if (blob.centerPositions[prevFrameIndex].x < intVerticalLinePosition &&
-          blob.centerPositions[currFrameIndex].x >= intVerticalLinePosition) {
+      if (blob.center_positions_[prevFrameIndex].x < intVerticalLinePosition &&
+          blob.center_positions_[currFrameIndex].x >= intVerticalLinePosition) {
         carCountR++;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
@@ -69,7 +65,7 @@ void Tools::matchCurrentFrameBlobsToExistingBlobs(
   for (auto &existingBlob : existingBlobs) {
     existingBlob.blnCurrentMatchFoundOrNewBlob = false;
 
-    existingBlob.predictNextPosition();
+    existingBlob.PredictNextPosition();
   }
 
   for (auto &currentFrameBlob : currentFrameBlobs) {
@@ -79,8 +75,8 @@ void Tools::matchCurrentFrameBlobsToExistingBlobs(
     for (unsigned int i = 0; i < existingBlobs.size(); i++) {
       if (existingBlobs[i].blnStillBeingTracked == true) {
         double dblDistance = traffic_monitor::Tools::distanceBetweenPoints(
-            currentFrameBlob.centerPositions.back(),
-            existingBlobs[i].predictedNextPosition);
+            currentFrameBlob.center_positions_.back(),
+            existingBlobs[i].predicted_next_position_);
 
         if (dblDistance < dblLeastDistance) {
           dblLeastDistance = dblDistance;
@@ -111,12 +107,12 @@ void Tools::matchCurrentFrameBlobsToExistingBlobs(
 void Tools::addBlobToExistingBlobs(Blob &currentFrameBlob,
                                    std::vector<Blob> &existingBlobs,
                                    int &intIndex) {
-  existingBlobs[intIndex].currentContour = currentFrameBlob.currentContour;
-  existingBlobs[intIndex].currentBoundingRect =
-      currentFrameBlob.currentBoundingRect;
+  existingBlobs[intIndex].current_contour_ = currentFrameBlob.current_contour_;
+  existingBlobs[intIndex].current_bounding_rect_ =
+      currentFrameBlob.current_bounding_rect_;
 
-  existingBlobs[intIndex].centerPositions.push_back(
-      currentFrameBlob.centerPositions.back());
+  existingBlobs[intIndex].center_positions_.push_back(
+      currentFrameBlob.center_positions_.back());
 
   existingBlobs[intIndex].dblCurrentDiagonalSize =
       currentFrameBlob.dblCurrentDiagonalSize;

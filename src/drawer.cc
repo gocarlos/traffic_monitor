@@ -12,28 +12,29 @@ Drawer::~Drawer() {
   // TODO Auto-generated destructor stub
 }
 
-void Drawer::drawBlobInfoOnImage(std::vector<Blob> &blobs,
+void Drawer::DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                                  cv::Mat &imgFrame2Copy) {
-  for (unsigned int i = 0; i < blobs.size(); i++) {
+  for (std::size_t i = 0; i < blobs.size(); ++i) {
     if (blobs[i].blnStillBeingTracked == true) {
-      cv::rectangle(imgFrame2Copy, blobs[i].currentBoundingRect, SCALAR_RED, 2);
+      cv::rectangle(imgFrame2Copy, blobs[i].current_bounding_rect_, SCALAR_RED,
+                    2);
 
       int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
       double dblFontScale = blobs[i].dblCurrentDiagonalSize / 60.0;
-      int intFontThickness = (int)std::round(dblFontScale * 1.0);
+      int intFontThickness = (int)std::round((float)dblFontScale * 1.0f);
 
       cv::putText(imgFrame2Copy, std::to_string(i),
-                  blobs[i].centerPositions.back(), intFontFace, dblFontScale,
+                  blobs[i].center_positions_.back(), intFontFace, dblFontScale,
                   SCALAR_GREEN, intFontThickness);
     }
   }
 }
 
-void Drawer::drawCarCountOnImage(int &carCountL, int &carCountR,
+void Drawer::DrawCarCountOnImage(int &carCountL, int &carCountR,
                                  cv::Mat &imgFrame2Copy) {
   int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
   double dblFontScale = (imgFrame2Copy.rows * imgFrame2Copy.cols) / 300000.0;
-  int intFontThickness = (int)std::round(dblFontScale * 1.5);
+  int intFontThickness = (int)std::round((float)dblFontScale * 1.5f);
 
   cv::Size textSizeL =
       cv::getTextSize("L: " + std::to_string(carCountL), intFontFace,
@@ -60,7 +61,7 @@ void Drawer::drawCarCountOnImage(int &carCountL, int &carCountR,
               SCALAR_YELLOW, intFontThickness);
 }
 
-void Drawer::drawAndShowContours(cv::Size imageSize,
+void Drawer::DrawAndShowContours(cv::Size imageSize,
                                  std::vector<std::vector<cv::Point>> contours,
                                  std::string strImageName) {
   cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
@@ -70,7 +71,7 @@ void Drawer::drawAndShowContours(cv::Size imageSize,
   // cv::imshow(strImageName, image);
 }
 
-void Drawer::drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
+void Drawer::DrawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
                                  std::string strImageName) {
   cv::Mat image(imageSize, CV_8UC3, SCALAR_BLACK);
 
@@ -78,7 +79,7 @@ void Drawer::drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
 
   for (auto &blob : blobs) {
     if (blob.blnStillBeingTracked == true) {
-      contours.push_back(blob.currentContour);
+      contours.push_back(blob.current_contour_);
     }
   }
 

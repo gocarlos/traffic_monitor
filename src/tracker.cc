@@ -38,7 +38,7 @@ Tracker::Tracker() {
          cv::Size(imgFrame2L.size().width / FRAME_SCALE,
                   imgFrame2L.size().height / FRAME_SCALE));
 
-  intVerticalLinePosition = std::round(imgFrame1.cols * 0.50);
+  intVerticalLinePosition = std::round(imgFrame1.cols * 0.50f);
 
   crossingLine[0].y = 0;
   crossingLine[0].x = intVerticalLinePosition;
@@ -100,7 +100,7 @@ int Tracker::run() {
     cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL,
                      cv::CHAIN_APPROX_SIMPLE);
 
-    Drawer::drawAndShowContours(imgThresh.size(), contours, "imgContours");
+    Drawer::DrawAndShowContours(imgThresh.size(), contours, "imgContours");
 
     std::vector<std::vector<cv::Point>> convexHulls(contours.size());
 
@@ -108,25 +108,25 @@ int Tracker::run() {
       cv::convexHull(contours[i], convexHulls[i]);
     }
 
-    Drawer::drawAndShowContours(imgThresh.size(), convexHulls,
+    Drawer::DrawAndShowContours(imgThresh.size(), convexHulls,
                                 "imgConvexHulls");
 
     for (auto &convexHull : convexHulls) {
       Blob possibleBlob(convexHull);
 
-      if (possibleBlob.currentBoundingRect.area() > 400 &&
+      if (possibleBlob.current_bounding_rect_.area() > 400 &&
           possibleBlob.dblCurrentAspectRatio > 0.2 &&
           possibleBlob.dblCurrentAspectRatio < 4.0 &&
-          possibleBlob.currentBoundingRect.width > 30 &&
-          possibleBlob.currentBoundingRect.height > 30 &&
+          possibleBlob.current_bounding_rect_.width > 30 &&
+          possibleBlob.current_bounding_rect_.height > 30 &&
           possibleBlob.dblCurrentDiagonalSize > 60.0 &&
-          (cv::contourArea(possibleBlob.currentContour) /
-           (double)possibleBlob.currentBoundingRect.area()) > 0.50) {
+          (cv::contourArea(possibleBlob.current_contour_) /
+           (double)possibleBlob.current_bounding_rect_.area()) > 0.50) {
         currentFrameBlobs.push_back(possibleBlob);
       }
     }
 
-    Drawer::drawAndShowContours(imgThresh.size(), currentFrameBlobs,
+    Drawer::DrawAndShowContours(imgThresh.size(), currentFrameBlobs,
                                 "imgCurrentFrameBlobs");
 
     if (blnFirstFrame == true) {
@@ -137,12 +137,12 @@ int Tracker::run() {
       Tools::matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
     }
 
-    Drawer::drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
+    Drawer::DrawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
     // get another copy of frame 2 since we changed the previous frame 2 copy in
     // the processing above
     imgFrame2Copy = imgFrame2.clone();
 
-    Drawer::drawBlobInfoOnImage(blobs, imgFrame2Copy);
+    Drawer::DrawBlobInfoOnImage(blobs, imgFrame2Copy);
 
     int blnAtLeastOneBlobCrossedTheLine =
         traffic_monitor::Tools::checkIfBlobsCrossedTheLine(
@@ -158,7 +158,7 @@ int Tracker::run() {
       cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_BLUE, 2);
     }
 
-    Drawer::drawCarCountOnImage(carCountL, carCountR, imgFrame2Copy);
+    Drawer::DrawCarCountOnImage(carCountL, carCountR, imgFrame2Copy);
 
     cv::imshow("imgFrame2Copy", imgFrame2Copy);
 

@@ -1,7 +1,9 @@
 // (c) 2017 Vigilatore
 
-#ifndef MY_BLOB
-#define MY_BLOB
+#ifndef INCLUDE_TRAFFIC_MONITOR_DRAWER_BLOB_H_
+#define INCLUDE_TRAFFIC_MONITOR_DRAWER_BLOB_H_
+
+#include <cmath>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -9,16 +11,13 @@
 
 #include <glog/logging.h>
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 class Blob {
  public:
-  // member variables
-  // ///////////////////////////////////////////////////////////////////////////
-  std::vector<cv::Point> currentContour;
+  std::vector<cv::Point> current_contour_;
 
-  cv::Rect currentBoundingRect;
+  cv::Rect current_bounding_rect_;
 
-  std::vector<cv::Point> centerPositions;
+  std::vector<cv::Point> center_positions_;
 
   double dblCurrentDiagonalSize;
   double dblCurrentAspectRatio;
@@ -29,12 +28,10 @@ class Blob {
 
   int intNumOfConsecutiveFramesWithoutAMatch;
 
-  cv::Point predictedNextPosition;
+  cv::Point predicted_next_position_;
 
-  // function prototypes
-  // ////////////////////////////////////////////////////////////////////////
   Blob(std::vector<cv::Point> _contour);
-  void predictNextPosition(void);
+  void PredictNextPosition();
 };
 
-#endif  // MY_BLOB
+#endif  // INCLUDE_TRAFFIC_MONITOR_DRAWER_BLOB_H_

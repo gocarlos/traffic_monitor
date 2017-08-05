@@ -1,9 +1,4 @@
-/*
- * tracker.h
- *
- *  Created on: Aug 5, 2017
- *      Author: gocarlos
- */
+// (c) 2017 Vigilatore
 
 #ifndef INCLUDE_TRAFFIC_MONITOR_TRACKER_H_
 #define INCLUDE_TRAFFIC_MONITOR_TRACKER_H_
