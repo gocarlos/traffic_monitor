@@ -3,10 +3,8 @@ Type=Application
 Name=TrafficMonitor
 GenericName=Traffic Monitor
 Comment=An app to count cars.
-Keywords=traffic;computer vision;data mining; 
+Keywords=traffic;computer vision;data mining;
 Exec=road-traffic-monitor
 Icon=${SNAP}/meta/gui/icon.png
 Terminal=true
 StartupNotify=true
-
-Name[en_US]=traffic_monitor.desktop

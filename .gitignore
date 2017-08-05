@@ -8,6 +8,7 @@ build/
 CMakeFiles/
 CMakeCache.txt
 
+*.snap
 
 # Prerequisites
 *.d
