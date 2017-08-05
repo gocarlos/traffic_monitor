@@ -27,7 +27,7 @@ SET(TM_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 
 ################################
-# Define Traffic Monitor Library
+# Define Traffic Monitor Ressources
 ################################
 
 FILE(GLOB_RECURSE TM_LIB_HEADERS "${TM_LIB_HEADER_DIR}/*.h")
@@ -36,11 +36,6 @@ FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
 # Remove the executable from that list.
 SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
-
-# ADD_LIBRARY(${TM_LIB} STATIC ${TM_LIB_RESOURCES})
-# TARGET_LINK_LIBRARIES(${TM_LIB}
-  # ${OpenCV_LIBRARIES} ${MINI_GLOG}
-# )
 
 ################################
 # Define Traffic Monitor Executable
