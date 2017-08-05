@@ -13,7 +13,7 @@
 #include <ctime>   // timestamp stuff
 #include <fstream> // file utils
 
-#include "Blob.h"
+#include "traffic_monitor/Blob.h"
 
 #define SHOW_STEPS // un-comment or comment this line to show steps or not
 

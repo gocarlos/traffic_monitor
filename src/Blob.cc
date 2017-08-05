@@ -1,6 +1,6 @@
 // Blob.cpp
 
-#include "Blob.h"
+#include "traffic_monitor/Blob.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 Blob::Blob(std::vector<cv::Point> _contour) {
@@ -105,7 +105,3 @@ void Blob::predictNextPosition(void) {
     }
 
 }
-
-
-
-

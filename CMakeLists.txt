@@ -1,6 +1,25 @@
-cmake_minimum_required(VERSION 2.8)
-project( main )
-find_package( OpenCV REQUIRED )
-include_directories( ${OpenCV_INCLUDE_DIRS} )
-add_executable( main main.cpp Blob.cpp Blob.h )
-target_link_libraries( main ${OpenCV_LIBS} )
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+
+
+PROJECT(traffic_monitor)
+
+
+FIND_PACKAGE( OpenCV REQUIRED )
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_LIST_DIR}/include
+  ${OpenCV_INCLUDE_DIRS}
+)
+
+SET(OMD_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+SET(OMD_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+
+FILE(GLOB_RECURSE OMD_LIB_HEADERS "${OMD_LIB_HEADER_DIR}/*.h")
+FILE(GLOB_RECURSE OMD_LIB_SOURCES "${OMD_LIB_SRC_DIR}/*.cc")
+SET(OMD_LIB_RESOURCES ${OMD_LIB_SOURCES} ${OMD_LIB_HEADERS})
+
+
+ADD_EXECUTABLE(${PROJECT_NAME} ${OMD_LIB_RESOURCES})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}
+  debug ${OpenCV_LIBS} optimized ${OpenCV_LIBS}
+)
