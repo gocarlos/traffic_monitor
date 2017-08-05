@@ -1,6 +1,6 @@
 // (c) 2017 Vigilatore
 
-#include "traffic_monitor/Blob.h"
+#include <traffic_monitor/blob.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 Blob::Blob(std::vector<cv::Point> _contour) {
