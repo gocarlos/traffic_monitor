@@ -10,28 +10,7 @@
 namespace traffic_monitor {
 
 Tracker::Tracker() {
-  // TODO Auto-generated constructor stub
-}
-
-Tracker::~Tracker() {
-  // TODO Auto-generated destructor stub
-}
-
-int Tracker::run() {
-  cv::VideoCapture capVideo;
-  std::ofstream myfile;
-
-  cv::Mat imgFrame1;
-  cv::Mat imgFrame2;
-  cv::Mat imgFrame1L;
-  cv::Mat imgFrame2L;
-
-  std::vector<Blob> blobs;
-
-  cv::Point crossingLine[2];
-
-  int carCountL = 0;
-  int carCountR = 0;
+  LOG(INFO) << "Setting up the tracker.";
 
   // capVideo.open("../movie.mp4");
   std::size_t num_cameras{0};
@@ -64,7 +43,7 @@ int Tracker::run() {
          cv::Size(imgFrame2L.size().width / FRAME_SCALE,
                   imgFrame2L.size().height / FRAME_SCALE));
 
-  int intVerticalLinePosition = std::round(imgFrame1.cols * 0.50);
+  intVerticalLinePosition = std::round(imgFrame1.cols * 0.50);
 
   crossingLine[0].y = 0;
   crossingLine[0].x = intVerticalLinePosition;
@@ -72,11 +51,16 @@ int Tracker::run() {
   crossingLine[1].y = imgFrame1.rows - 1;
   crossingLine[1].x = intVerticalLinePosition;
 
-  char chCheckForEscKey = 0;
-
+  frameCount = 2;
   bool blnFirstFrame = true;
+}
 
-  int frameCount = 2;
+Tracker::~Tracker() {
+  // TODO Auto-generated destructor stub
+}
+
+int Tracker::run() {
+  LOG(INFO) << "Entering the main loop.";
 
   while (capVideo.isOpened() && chCheckForEscKey != 27) {
     std::vector<Blob> currentFrameBlobs;
@@ -159,10 +143,9 @@ int Tracker::run() {
     }
 
     Drawer::drawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
-
-    imgFrame2Copy = imgFrame2.clone();  // get another copy of frame 2 since we
-                                        // changed the previous frame 2 copy in
-                                        // the processing above
+    // get another copy of frame 2 since we changed the previous frame 2 copy in
+    // the processing above
+    imgFrame2Copy = imgFrame2.clone();
 
     Drawer::drawBlobInfoOnImage(blobs, imgFrame2Copy);
 
@@ -186,7 +169,8 @@ int Tracker::run() {
 
     currentFrameBlobs.clear();
 
-    imgFrame1 = imgFrame2.clone();  // move frame 1 up to where frame 2 is
+    // move frame 1 up to where frame 2 is
+    imgFrame1 = imgFrame2.clone();
 
     capVideo.read(imgFrame2L);
     resize(imgFrame2L, imgFrame2,
@@ -194,17 +178,15 @@ int Tracker::run() {
                     imgFrame2L.size().height / FRAME_SCALE));
 
     blnFirstFrame = false;
-    frameCount++;
+    ++frameCount;
     chCheckForEscKey = cv::waitKey(1);
   }
 
-  if (chCheckForEscKey != 27) {  // if the user did not press esc (i.e. we
-                                 // reached the end of the video)
-    cv::waitKey(0);  // hold the windows open to allow the "end of video"
-                     // message to show
+  if (chCheckForEscKey != 27) {
+    // if the user did not press esc (i.e. we reached the end of the video)
+    // hold the windows open to allow the "end of video" message to show
+    cv::waitKey(0);
   }
-  // note that if the user did press esc, we don't need to hold the windows
-  // open, we can simply let the program end which will close the windows
 }
 
 } /* namespace traffic_monitor */
