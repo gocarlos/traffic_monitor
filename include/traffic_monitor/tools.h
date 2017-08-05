@@ -15,6 +15,8 @@
 
 #include "traffic_monitor/blob.h"
 
+#define FRAME_SCALE 1  // divide frame dimensions by this number
+
 const cv::Scalar SCALAR_BLACK = cv::Scalar(0.0, 0.0, 0.0);
 const cv::Scalar SCALAR_WHITE = cv::Scalar(255.0, 255.0, 255.0);
 const cv::Scalar SCALAR_YELLOW = cv::Scalar(0.0, 255.0, 255.0);
