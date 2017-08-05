@@ -37,18 +37,18 @@ FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
 SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 
-ADD_LIBRARY(${TM_LIB} STATIC ${TM_LIB_RESOURCES})
-TARGET_LINK_LIBRARIES(${TM_LIB}
-  ${OpenCV_LIBRARIES} ${MINI_GLOG}
-)
+# ADD_LIBRARY(${TM_LIB} STATIC ${TM_LIB_RESOURCES})
+# TARGET_LINK_LIBRARIES(${TM_LIB}
+  # ${OpenCV_LIBRARIES} ${MINI_GLOG}
+# )
 
 ################################
 # Define Traffic Monitor Executable
 ################################
 
-ADD_EXECUTABLE(traffic_monitor "${TM_LIB_SRC_DIR}/main.cc")
+ADD_EXECUTABLE(traffic_monitor ${TM_LIB_RESOURCES} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(traffic_monitor
-  ${MINI_GLOG} ${TM_LIB}
+  ${TM_LIB} ${OpenCV_LIBRARIES} ${MINI_GLOG}
 )
 
 ################################
