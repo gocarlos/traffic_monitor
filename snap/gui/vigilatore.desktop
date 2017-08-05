@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Terminal=true
-Exec=vigilatore
-Name=vigilatore App
-Icon=${SNAP}/meta/gui/icon.png
-Categories=Utility;
