@@ -26,16 +26,36 @@ INCLUDE("${CMAKE_CURRENT_LIST_DIR}/external/miniglog/CMakeLists.txt")
 SET(TM_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 
+################################
+# Define Traffic Monitor Library
+################################
+
 FILE(GLOB_RECURSE TM_LIB_HEADERS "${TM_LIB_HEADER_DIR}/*.h")
 FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
+
+# Remove the executable from that list.
+LIST(REMOVE_ITEM ${TM_LIB_RESOURCES} "${TM_LIB_SRC_DIR}/main.cc")
 SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 
-ADD_EXECUTABLE(${TRAFFIC_MONITOR_TARGET} ${TM_LIB_RESOURCES})
+ADD_LIBRARY(${TM_LIB} STATIC ${TM_LIB_RESOURCES})
+TARGET_LINK_LIBRARIES(${TM_LIB}
+  debug ${OpenCV_LIBRARIES} optimized ${OpenCV_LIBRARIES}
+)
+
+################################
+# Define Traffic Monitor Executable
+################################
+
+ADD_EXECUTABLE(${TRAFFIC_MONITOR_TARGET} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(${TRAFFIC_MONITOR_TARGET}
 #  ${OpenCV_LIBS} ${MINI_GLOG}
   debug ${MINI_GLOG} optimized ${MINI_GLOG}
-  debug ${OpenCV_LIBRARIES} optimized ${OpenCV_LIBRARIES}
+  debug ${TM_LIB} optimized ${TM_LIB}
   )
+
+################################
+# Install Traffic Monitor Executable
+################################
 
 INSTALL(
    TARGETS ${TRAFFIC_MONITOR_TARGET}
