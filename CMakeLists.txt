@@ -48,10 +48,8 @@ TARGET_LINK_LIBRARIES(${TM_LIB}
 
 ADD_EXECUTABLE(${TRAFFIC_MONITOR_TARGET} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(${TRAFFIC_MONITOR_TARGET}
-#  ${OpenCV_LIBS} ${MINI_GLOG}
-  debug ${MINI_GLOG} optimized ${MINI_GLOG}
-  debug ${TM_LIB} optimized ${TM_LIB}
-  )
+  ${MINI_GLOG} ${TM_LIB}
+)
 
 ################################
 # Install Traffic Monitor Executable
