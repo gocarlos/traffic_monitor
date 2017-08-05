@@ -1,9 +1,4 @@
-/*
- * drawer.cc
- *
- *  Created on: Aug 5, 2017
- *      Author: gocarlos
- */
+// (c) 2017 Vigilatore
 
 #include <traffic_monitor/drawer.h>
 

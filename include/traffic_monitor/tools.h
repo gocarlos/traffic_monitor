@@ -1,9 +1,4 @@
-/*
- * Tools.h
- *
- *  Created on: Aug 5, 2017
- *      Author: gocarlos
- */
+// (c) 2017 Vigilatore
 
 #ifndef INCLUDE_TRAFFIC_MONITOR_TOOLS_H_
 #define INCLUDE_TRAFFIC_MONITOR_TOOLS_H_
@@ -39,8 +34,10 @@ class Tools {
   static void matchCurrentFrameBlobsToExistingBlobs(
       std::vector<Blob> &existingBlobs, std::vector<Blob> &currentFrameBlobs);
   static void addBlobToExistingBlobs(Blob &currentFrameBlob,
-                              std::vector<Blob> &existingBlobs, int &intIndex);
-  static void addNewBlob(Blob &currentFrameBlob, std::vector<Blob> &existingBlobs);
+                                     std::vector<Blob> &existingBlobs,
+                                     int &intIndex);
+  static void addNewBlob(Blob &currentFrameBlob,
+                         std::vector<Blob> &existingBlobs);
 };
 
 } /* namespace traffic_monitor */

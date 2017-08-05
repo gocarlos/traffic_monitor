@@ -1,0 +1,41 @@
+language:       c++
+sudo:           required
+dist:           trusty # 14.04
+before_install:
+  - sudo apt-get update
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-7
+      - g++-7
+      - cmake
+      # - python-dev
+      # - python-numpy
+      # - libeigen3-dev
+      # - freeglut3-dev # OpenGL
+      # - qt5-default
+      # - qtbase5-dev
+      # - libqt5opengl5
+      # - libqt5opengl5-dev
+before_script:
+      - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+      - sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+      - sudo apt-get update
+      - sudo apt-get install ros-indigo-ros-base
+      - sudo rosdep init
+      - rosdep update
+      - source /opt/ros/indigo/setup.bash
+      - sudo apt-get install ros-indigo-opencv3 ros-indigo-eigen-conversions
+
+script:
+  # Export CC and CXX to tell cmake which compiler to use
+  - export CC=/usr/bin/gcc-7
+  - export CXX=/usr/bin/g++-7
+  # Check versions of gcc, g++ and cmake
+  - gcc -v && g++ -v && cmake --version
+  - $CC --version
+  - $CXX --version
+  # Run your build commands next
+  - ./build.sh

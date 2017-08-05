@@ -20,7 +20,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
   ${OpenCV_INCLUDE_DIRS}
 )
-# TODO(gocarlos) add this as external project. 
+# TODO(gocarlos) add this as external project.
 INCLUDE("${CMAKE_CURRENT_LIST_DIR}/external/miniglog/CMakeLists.txt")
 
 SET(TM_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
@@ -39,8 +39,11 @@ TARGET_LINK_LIBRARIES(${TRAFFIC_MONITOR_TARGET}
   debug ${OpenCV_LIBRARIES} optimized ${OpenCV_LIBRARIES}
   )
 
-#INSTALL(
-#    TARGETS ${TRAFFIC_MONITOR_TARGET}
-#    RUNTIME DESTINATION bin
-#    LIBRARY DESTINATION lib
-#    )
+INSTALL(
+   TARGETS ${TRAFFIC_MONITOR_TARGET}
+   RUNTIME DESTINATION bin
+   LIBRARY DESTINATION lib
+   )
+
+# TODO(gocarlos) put the settings files there
+# INSTALL(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/data/ DESTINATION traffic_monitor)
