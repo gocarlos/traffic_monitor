@@ -21,10 +21,6 @@ Tracker::Tracker() {
   }
 }
 
-Tracker::~Tracker() {
-  // TODO Auto-generated destructor stub
-}
-
 int Tracker::run() {
   // TODO(gocarlos) choose the camera or video here.
   vid_capture_.open(0);

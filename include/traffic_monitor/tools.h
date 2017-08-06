@@ -16,10 +16,9 @@ namespace traffic_monitor {
 class Tools {
  public:
   Tools();
-  virtual ~Tools();
 
   static float DistanceBetweenPoints(const cv::Point &point1,
-                                      const cv::Point &point2);
+                                     const cv::Point &point2);
 
   static int CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
                                         int &intVerticalLinePosition,

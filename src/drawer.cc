@@ -4,14 +4,6 @@
 
 namespace traffic_monitor {
 
-Drawer::Drawer() {
-  // TODO Auto-generated constructor stub
-}
-
-Drawer::~Drawer() {
-  // TODO Auto-generated destructor stub
-}
-
 void Drawer::DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                                  cv::Mat &imgFrame2Copy) {
   for (std::size_t i = 0; i < blobs.size(); ++i) {

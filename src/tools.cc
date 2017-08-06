@@ -4,18 +4,12 @@
 
 namespace traffic_monitor {
 
-Tools::Tools() {
-  // TODO Auto-generated constructor stub
-}
-
-Tools::~Tools() {
-  // TODO Auto-generated destructor stub
-}
+Tools::Tools() {}
 
 float Tools::DistanceBetweenPoints(const cv::Point &point1,
-                                    const cv::Point &point2) {
+                                   const cv::Point &point2) {
   return (std::sqrt(float(std::pow(std::abs(float(point1.x - point2.x)), 2) +
-                    std::pow(std::abs(float(point1.y - point2.y)), 2))));
+                          std::pow(std::abs(float(point1.y - point2.y)), 2))));
 }
 
 int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
@@ -94,10 +88,10 @@ void Tools::MatchCurrentFrameBlobsToExistingBlobs(
 
   for (auto &existingBlob : existing_blobs) {
     if (existingBlob.current_match_found_or_newblob_ == false) {
-      existingBlob.intNumOfConsecutiveFramesWithoutAMatch++;
+      existingBlob.num_consecutive_frames_without_match_++;
     }
 
-    if (existingBlob.intNumOfConsecutiveFramesWithoutAMatch >= 5) {
+    if (existingBlob.num_consecutive_frames_without_match_ >= 5) {
       existingBlob.still_being_tracked_ = false;
     }
   }

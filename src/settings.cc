@@ -4,14 +4,6 @@
 
 namespace traffic_monitor {
 
-Settings::Settings() {
-  // TODO Auto-generated constructor stub
-}
-
-Settings::~Settings() {
-  // TODO Auto-generated destructor stub
-}
-
 std::string Settings::path_to_log_file_{"~/.config/traffic_monitor"};
 bool Settings::with_gui_ = true;
 bool Settings::debug_mode_ = false;

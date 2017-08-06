@@ -23,9 +23,6 @@ namespace traffic_monitor {
 
 class Settings {
  public:
-  Settings();
-  virtual ~Settings();
-
   static std::string path_to_log_file_;
   static bool with_gui_;
   static bool debug_mode_;

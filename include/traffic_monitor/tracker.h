@@ -44,7 +44,6 @@ class Tracker {
 
  public:
   Tracker();
-  virtual ~Tracker();
   int run();
 };
 

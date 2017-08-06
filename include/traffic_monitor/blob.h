@@ -26,7 +26,7 @@ class Blob {
 
   bool still_being_tracked_;
 
-  int intNumOfConsecutiveFramesWithoutAMatch;
+  int num_consecutive_frames_without_match_;
 
   cv::Point predicted_next_position_;
 
