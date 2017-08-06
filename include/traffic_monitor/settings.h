@@ -18,6 +18,7 @@ class Settings {
   virtual ~Settings();
   static std::string path_to_log_file;
   static bool with_gui_;
+  static bool debug_mode_;
 };
 
 } /* namespace traffic_monitor */

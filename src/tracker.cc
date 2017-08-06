@@ -19,6 +19,13 @@ Tracker::Tracker() {
     LOG(INFO) << "There are " << num_cameras
               << " available. \nTaking the first one";
   }
+}
+
+Tracker::~Tracker() {
+  // TODO Auto-generated destructor stub
+}
+
+int Tracker::run() {
   // TODO(gocarlos) choose the camera or video here.
   capVideo.open(0);
 
@@ -48,17 +55,11 @@ Tracker::Tracker() {
 
   frameCount = 2;
   bool blnFirstFrame = true;
-}
 
-Tracker::~Tracker() {
-  // TODO Auto-generated destructor stub
-}
-
-int Tracker::run() {
   LOG(INFO) << "Entering the main loop.";
 
   while (capVideo.isOpened() && chCheckForEscKey != 27) {
-    std::vector<Blob> currentFrameBlobs;
+    std::vector<Blob> current_frame_blobs;
 
     cv::Mat imgFrame1Copy = imgFrame1.clone();
     cv::Mat imgFrame2Copy = imgFrame2.clone();
@@ -122,19 +123,19 @@ int Tracker::run() {
           possibleBlob.dblCurrentDiagonalSize > 60.0 &&
           (cv::contourArea(possibleBlob.current_contour_) /
            (double)possibleBlob.current_bounding_rect_.area()) > 0.50) {
-        currentFrameBlobs.push_back(possibleBlob);
+        current_frame_blobs.push_back(possibleBlob);
       }
     }
 
-    Drawer::DrawAndShowContours(imgThresh.size(), currentFrameBlobs,
+    Drawer::DrawAndShowContours(imgThresh.size(), current_frame_blobs,
                                 "imgCurrentFrameBlobs");
 
     if (blnFirstFrame == true) {
-      for (auto &currentFrameBlob : currentFrameBlobs) {
+      for (auto &currentFrameBlob : current_frame_blobs) {
         blobs.push_back(currentFrameBlob);
       }
     } else {
-      Tools::matchCurrentFrameBlobsToExistingBlobs(blobs, currentFrameBlobs);
+      Tools::matchCurrentFrameBlobsToExistingBlobs(blobs, current_frame_blobs);
     }
 
     Drawer::DrawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
@@ -162,7 +163,7 @@ int Tracker::run() {
 
     cv::imshow("imgFrame2Copy", imgFrame2Copy);
 
-    currentFrameBlobs.clear();
+    current_frame_blobs.clear();
 
     // move frame 1 up to where frame 2 is
     imgFrame1 = imgFrame2.clone();
@@ -182,6 +183,7 @@ int Tracker::run() {
     // hold the windows open to allow the "end of video" message to show
     cv::waitKey(0);
   }
+  return 0;
 }
 
 } /* namespace traffic_monitor */

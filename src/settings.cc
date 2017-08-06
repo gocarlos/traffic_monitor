@@ -19,5 +19,7 @@ Settings::~Settings() {
 
 std::string Settings::path_to_log_file{"~/.config/traffic_monitor"};
 bool Settings::with_gui_ = true;
+bool Settings::debug_mode_ = false;
+
 
 } /* namespace traffic_monitor */
