@@ -18,6 +18,7 @@ FIND_PACKAGE(OpenCV REQUIRED)
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
+  ${CMAKE_CURRENT_LIST_DIR}/external/argparse
   ${OpenCV_INCLUDE_DIRS}
 )
 # TODO(gocarlos) add this as external project.
@@ -30,7 +31,7 @@ SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 # Define Traffic Monitor Ressources
 ################################
 
-FILE(GLOB_RECURSE TM_LIB_HEADERS "${TM_LIB_HEADER_DIR}/*.h")
+FILE(GLOB_RECURSE TM_LIB_HEADERS "${TM_LIB_HEADER_DIR}/*.h ")
 FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
 
 # Remove the executable from that list.

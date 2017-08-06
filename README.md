@@ -1,6 +1,9 @@
 # Car Counter app.
 
-This app can be used to count the amount of traffic on a street. Its available as a ubuntu snap and can therefore be installed on every newer (<2014) machine. Install instructions can be found below. You can test the app with a video instead of webcam if you like.
+This app can be used to count the amount of traffic on a street. Its available as a Ubuntu snap and can therefore be installed on every newer (>2014 e.g. Ubuntu 14.04) machine. Install instructions can be found below. You can test the app with a video instead of web cam if you like.
+
+# Project status
+This is still under development and not ready as plug and play, will happen in the next few days. Check in a few days again :smile:
 
 [![Build Status](https://travis-ci.org/vigilatore/traffic_monitor.svg?branch=master)](https://travis-ci.org/vigilatore/traffic_monitor)
 
