@@ -25,8 +25,8 @@ Blob::Blob(std::vector<cv::Point> _contour) {
   dblCurrentAspectRatio = (float)current_bounding_rect_.width /
                           (float)current_bounding_rect_.height;
 
-  blnStillBeingTracked = true;
-  blnCurrentMatchFoundOrNewBlob = true;
+  still_being_tracked_ = true;
+  current_match_found_or_newblob_ = true;
 
   intNumOfConsecutiveFramesWithoutAMatch = 0;
 }

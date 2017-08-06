@@ -22,9 +22,9 @@ class Blob {
   double dblCurrentDiagonalSize;
   double dblCurrentAspectRatio;
 
-  bool blnCurrentMatchFoundOrNewBlob;
+  bool current_match_found_or_newblob_;
 
-  bool blnStillBeingTracked;
+  bool still_being_tracked_;
 
   int intNumOfConsecutiveFramesWithoutAMatch;
 

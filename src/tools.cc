@@ -12,45 +12,44 @@ Tools::~Tools() {
   // TODO Auto-generated destructor stub
 }
 
-double Tools::distanceBetweenPoints(cv::Point point1, cv::Point point2) {
-  int intX = std::abs(point1.x - point2.x);
-  int intY = std::abs(point1.y - point2.y);
-
-  return (std::sqrt(std::pow(intX, 2) + std::pow(intY, 2)));
+double Tools::DistanceBetweenPoints(const cv::Point &point1,
+                                    const cv::Point &point2) {
+  return (std::sqrt(std::pow(std::abs(point1.x - point2.x), 2) +
+                    std::pow(std::abs(point1.y - point2.y), 2)));
 }
 
-bool Tools::checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
-                                       int &intVerticalLinePosition,
-                                       int &carCountL, int &carCountR,
-                                       std::ofstream &myfile) {
-  bool blnAtLeastOneBlobCrossedTheLine = 0;
+int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
+                                      int &intVerticalLinePosition,
+                                      int &carCountL, int &number_cars,
+                                      std::ofstream &myfile) {
+  int blnAtLeastOneBlobCrossedTheLine = 0;
 
   for (auto blob : blobs) {
-    if (blob.blnStillBeingTracked == true &&
+    if (blob.still_being_tracked_ == true &&
         blob.center_positions_.size() >= 2) {
       int prevFrameIndex = (int)blob.center_positions_.size() - 2;
       int currFrameIndex = (int)blob.center_positions_.size() - 1;
 
-      // going left
+      // Going left.
       if (blob.center_positions_[prevFrameIndex].x > intVerticalLinePosition &&
           blob.center_positions_[currFrameIndex].x <= intVerticalLinePosition) {
         carCountL++;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
         ;
-        std::cout << dt << ",1,0 (Left)" << std::endl;
+        LOG(INFO) << dt << ",1,0 (Left)";
         myfile << dt << ",1,0" << std::endl;
         blnAtLeastOneBlobCrossedTheLine = 1;
       }
 
-      // going right
+      // Going right.
       if (blob.center_positions_[prevFrameIndex].x < intVerticalLinePosition &&
           blob.center_positions_[currFrameIndex].x >= intVerticalLinePosition) {
-        carCountR++;
+        ++number_cars;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
         ;
-        std::cout << dt << ",0,1 (Right)" << std::endl;
+        LOG(INFO) << dt << ",0,1 (Right)" << std::endl;
         myfile << dt << ",0,1" << std::endl;
         blnAtLeastOneBlobCrossedTheLine = 2;
       }
@@ -60,72 +59,72 @@ bool Tools::checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
   return blnAtLeastOneBlobCrossedTheLine;
 }
 
-void Tools::matchCurrentFrameBlobsToExistingBlobs(
-    std::vector<Blob> &existingBlobs, std::vector<Blob> &currentFrameBlobs) {
-  for (auto &existingBlob : existingBlobs) {
-    existingBlob.blnCurrentMatchFoundOrNewBlob = false;
+void Tools::MatchCurrentFrameBlobsToExistingBlobs(
+    std::vector<Blob> &existing_blobs, std::vector<Blob> &current_frame_blobs) {
+  for (auto &existing_blob : existing_blobs) {
+    existing_blob.current_match_found_or_newblob_ = false;
 
-    existingBlob.PredictNextPosition();
+    existing_blob.PredictNextPosition();
   }
 
-  for (auto &currentFrameBlob : currentFrameBlobs) {
-    int intIndexOfLeastDistance = 0;
-    double dblLeastDistance = 100000.0;
+  for (auto &currentFrameBlob : current_frame_blobs) {
+    int index_least_distance = 0;
+    double least_distance = 100000.0;
 
-    for (unsigned int i = 0; i < existingBlobs.size(); i++) {
-      if (existingBlobs[i].blnStillBeingTracked == true) {
-        double dblDistance = traffic_monitor::Tools::distanceBetweenPoints(
+    for (std::size_t i = 0; i < existing_blobs.size(); ++i) {
+      if (existing_blobs[i].still_being_tracked_ == true) {
+        double dblDistance = traffic_monitor::Tools::DistanceBetweenPoints(
             currentFrameBlob.center_positions_.back(),
-            existingBlobs[i].predicted_next_position_);
+            existing_blobs[i].predicted_next_position_);
 
-        if (dblDistance < dblLeastDistance) {
-          dblLeastDistance = dblDistance;
-          intIndexOfLeastDistance = i;
+        if (dblDistance < least_distance) {
+          least_distance = dblDistance;
+          index_least_distance = i;
         }
       }
     }
 
-    if (dblLeastDistance < currentFrameBlob.dblCurrentDiagonalSize * 0.5) {
-      addBlobToExistingBlobs(currentFrameBlob, existingBlobs,
-                             intIndexOfLeastDistance);
+    if (least_distance < currentFrameBlob.dblCurrentDiagonalSize * 0.5) {
+      AddBlobToExistingBlobs(currentFrameBlob, existing_blobs,
+                             index_least_distance);
     } else {
-      addNewBlob(currentFrameBlob, existingBlobs);
+      AddNewBlob(currentFrameBlob, existing_blobs);
     }
   }
 
-  for (auto &existingBlob : existingBlobs) {
-    if (existingBlob.blnCurrentMatchFoundOrNewBlob == false) {
+  for (auto &existingBlob : existing_blobs) {
+    if (existingBlob.current_match_found_or_newblob_ == false) {
       existingBlob.intNumOfConsecutiveFramesWithoutAMatch++;
     }
 
     if (existingBlob.intNumOfConsecutiveFramesWithoutAMatch >= 5) {
-      existingBlob.blnStillBeingTracked = false;
+      existingBlob.still_being_tracked_ = false;
     }
   }
 }
 
-void Tools::addBlobToExistingBlobs(Blob &currentFrameBlob,
-                                   std::vector<Blob> &existingBlobs,
-                                   int &intIndex) {
-  existingBlobs[intIndex].current_contour_ = currentFrameBlob.current_contour_;
-  existingBlobs[intIndex].current_bounding_rect_ =
+void Tools::AddBlobToExistingBlobs(Blob &currentFrameBlob,
+                                   std::vector<Blob> &existing_blobs,
+                                   int &index) {
+  existing_blobs[index].current_contour_ = currentFrameBlob.current_contour_;
+  existing_blobs[index].current_bounding_rect_ =
       currentFrameBlob.current_bounding_rect_;
 
-  existingBlobs[intIndex].center_positions_.push_back(
+  existing_blobs[index].center_positions_.push_back(
       currentFrameBlob.center_positions_.back());
 
-  existingBlobs[intIndex].dblCurrentDiagonalSize =
+  existing_blobs[index].dblCurrentDiagonalSize =
       currentFrameBlob.dblCurrentDiagonalSize;
-  existingBlobs[intIndex].dblCurrentAspectRatio =
+  existing_blobs[index].dblCurrentAspectRatio =
       currentFrameBlob.dblCurrentAspectRatio;
 
-  existingBlobs[intIndex].blnStillBeingTracked = true;
-  existingBlobs[intIndex].blnCurrentMatchFoundOrNewBlob = true;
+  existing_blobs[index].still_being_tracked_ = true;
+  existing_blobs[index].current_match_found_or_newblob_ = true;
 }
 
-void Tools::addNewBlob(Blob &currentFrameBlob,
+void Tools::AddNewBlob(Blob &currentFrameBlob,
                        std::vector<Blob> &existingBlobs) {
-  currentFrameBlob.blnCurrentMatchFoundOrNewBlob = true;
+  currentFrameBlob.current_match_found_or_newblob_ = true;
 
   existingBlobs.push_back(currentFrameBlob);
 }

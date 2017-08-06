@@ -8,6 +8,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "traffic_monitor/blob.h"
+#include "traffic_monitor/settings.h"
 #include "traffic_monitor/tools.h"
 
 namespace traffic_monitor {

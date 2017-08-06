@@ -39,11 +39,11 @@ int Tracker::run() {
   capVideo.read(imgFrame2L);
 
   resize(imgFrame1L, imgFrame1,
-         cv::Size(imgFrame1L.size().width / FRAME_SCALE,
-                  imgFrame1L.size().height / FRAME_SCALE));
+         cv::Size(imgFrame1L.size().width / Settings::FRAME_SCALE,
+                  imgFrame1L.size().height / Settings::FRAME_SCALE));
   resize(imgFrame2L, imgFrame2,
-         cv::Size(imgFrame2L.size().width / FRAME_SCALE,
-                  imgFrame2L.size().height / FRAME_SCALE));
+         cv::Size(imgFrame2L.size().width / Settings::FRAME_SCALE,
+                  imgFrame2L.size().height / Settings::FRAME_SCALE));
 
   intVerticalLinePosition = std::round(imgFrame1.cols * 0.50f);
 
@@ -135,7 +135,7 @@ int Tracker::run() {
         blobs.push_back(currentFrameBlob);
       }
     } else {
-      Tools::matchCurrentFrameBlobsToExistingBlobs(blobs, current_frame_blobs);
+      Tools::MatchCurrentFrameBlobsToExistingBlobs(blobs, current_frame_blobs);
     }
 
     Drawer::DrawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
@@ -146,7 +146,7 @@ int Tracker::run() {
     Drawer::DrawBlobInfoOnImage(blobs, imgFrame2Copy);
 
     int blnAtLeastOneBlobCrossedTheLine =
-        traffic_monitor::Tools::checkIfBlobsCrossedTheLine(
+        traffic_monitor::Tools::CheckIfBlobsCrossedTheLine(
             blobs, intVerticalLinePosition, carCountL, carCountR, myfile);
 
     if (blnAtLeastOneBlobCrossedTheLine == 1) {
@@ -170,8 +170,8 @@ int Tracker::run() {
 
     capVideo.read(imgFrame2L);
     resize(imgFrame2L, imgFrame2,
-           cv::Size(imgFrame2L.size().width / FRAME_SCALE,
-                    imgFrame2L.size().height / FRAME_SCALE));
+           cv::Size(imgFrame2L.size().width / Settings::FRAME_SCALE,
+                    imgFrame2L.size().height / Settings::FRAME_SCALE));
 
     blnFirstFrame = false;
     ++frameCount;

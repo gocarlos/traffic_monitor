@@ -15,7 +15,7 @@ Drawer::~Drawer() {
 void Drawer::DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                                  cv::Mat &imgFrame2Copy) {
   for (std::size_t i = 0; i < blobs.size(); ++i) {
-    if (blobs[i].blnStillBeingTracked == true) {
+    if (blobs[i].still_being_tracked == true) {
       cv::rectangle(imgFrame2Copy, blobs[i].current_bounding_rect_, SCALAR_RED,
                     2);
 
@@ -78,7 +78,7 @@ void Drawer::DrawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
   std::vector<std::vector<cv::Point>> contours;
 
   for (auto &blob : blobs) {
-    if (blob.blnStillBeingTracked == true) {
+    if (blob.still_being_tracked == true) {
       contours.push_back(blob.current_contour_);
     }
   }
