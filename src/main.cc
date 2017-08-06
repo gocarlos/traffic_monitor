@@ -1,30 +1,32 @@
 // (c) 2017 Vigilatore
 
+#include "cxxopts.hpp"
+#include "traffic_monitor/settings.h"
 #include "traffic_monitor/tracker.h"
-#include "argparse.hpp"
 
 using namespace traffic_monitor;
 
 int main(int argc, char *argv[]) {
-  google::InitGoogleLogging(argv[0]);
+  //  google::InitGoogleLogging(argv[0]);
 
-  // TODO(gocarlos): finish this. 
-  // make a new ArgumentParser
-  ArgumentParser parser;
+  cxxopts::Options options("Traffic Monitor", "TODO");
 
-  // // add some arguments to search for
-  // parser.addArgument("-withgui");
-  // parser.addArgument("-b");
-  // parser.addArgument("-c", "--cactus", 1);
-  // parser.addArgument("-o", "--optional");
-  // parser.addArgument("-r", "--required", 1, true);
-  // parser.addArgument("--five", 5);
-  // parser.addArgument("--atleast", '+');
-  // parser.addArgument("--any", '*');
-  // parser.addFinalArgument("output");
-  //
-  // // parse the command-line arguments - throws if invalid format
-  // parser.parse(argc, argv);
+  // clang-format off
+  options.add_options()
+		  ("d,debug", "Enable debugging")
+		  ("g,withgui", "Enable gui")
+		  ("l,logfile", "Logging file name", cxxopts::value<std::string>()
+		  );
+  // clang-format on
+
+  options.parse(argc, argv);
+  Settings::with_gui_ = options["withgui"].as<bool>();
+  LOG_IF(INFO, !Settings::with_gui_) << "Starting traffic monitor without GUI";
+
+  std::string log_file = options["logfile"].as<std::string>();
+  if (log_file.size() > 0) {
+    Settings::path_to_log_file = log_file;
+  }
 
   Tracker tracker;
 

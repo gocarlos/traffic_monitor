@@ -19,6 +19,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
   ${CMAKE_CURRENT_LIST_DIR}/external/argparse
+  ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
   ${OpenCV_INCLUDE_DIRS}
 )
 # TODO(gocarlos) add this as external project.

@@ -25,6 +25,8 @@ class Tools {
  public:
   Tools();
   virtual ~Tools();
+
+
   static double distanceBetweenPoints(cv::Point point1, cv::Point point2);
 
   static bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
