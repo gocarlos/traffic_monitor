@@ -11,5 +11,7 @@ The main inspiration for this work comes from this [tutorial video](https://www.
 
 * minilog (the same interface as google log but pretty small)
   * https://github.com/tzutalin/miniglog
-* argparse (header only argument parser library)
-  * https://github.com/hbristow/argparse
+<!-- * argparse (header only argument parser library)
+  * https://github.com/hbristow/argparse -->
+* cxxopts (header only argument parser library)
+  * https://github.com/jarro2783/cxxopts
