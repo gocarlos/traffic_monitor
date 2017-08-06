@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     Settings::path_to_log_file_ = log_file;
   }
 
-  LOG_IF(INFO, !Settings::with_gui_) << "Starting traffic monitor without GUI";
+  LOG_IF(INFO, not Settings::with_gui_) << "Starting traffic monitor without GUI";
   LOG_IF(INFO, Settings::debug_mode_)
       << "Starting traffic monitor in debug mode";
   LOG(INFO) << "Path to logging file is: " << Settings::path_to_log_file_;

@@ -11,7 +11,7 @@ Tracker::Tracker() {
   std::size_t num_cameras{0};
   for (std::size_t i = 0; i < 5; ++i) {
     vid_capture_.open(i);
-    if (!vid_capture_.isOpened()) {
+    if (not vid_capture_.isOpened()) {
       ++num_cameras;
     }
   }
