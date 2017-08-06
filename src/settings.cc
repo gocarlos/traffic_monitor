@@ -12,10 +12,10 @@ Settings::~Settings() {
   // TODO Auto-generated destructor stub
 }
 
-std::string Settings::path_to_log_file{"~/.config/traffic_monitor"};
+std::string Settings::path_to_log_file_{"~/.config/traffic_monitor"};
 bool Settings::with_gui_ = true;
 bool Settings::debug_mode_ = false;
 
-int Settings::FRAME_SCALE = 1;
+int Settings::frame_scale_ = 1;
 
 } /* namespace traffic_monitor */

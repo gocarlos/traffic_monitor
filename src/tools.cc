@@ -12,10 +12,10 @@ Tools::~Tools() {
   // TODO Auto-generated destructor stub
 }
 
-double Tools::DistanceBetweenPoints(const cv::Point &point1,
+float Tools::DistanceBetweenPoints(const cv::Point &point1,
                                     const cv::Point &point2) {
-  return (std::sqrt(std::pow(std::abs(point1.x - point2.x), 2) +
-                    std::pow(std::abs(point1.y - point2.y), 2)));
+  return (std::sqrt(float(std::pow(std::abs(float(point1.x - point2.x)), 2) +
+                    std::pow(std::abs(float(point1.y - point2.y)), 2))));
 }
 
 int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
@@ -84,7 +84,7 @@ void Tools::MatchCurrentFrameBlobsToExistingBlobs(
       }
     }
 
-    if (least_distance < currentFrameBlob.dblCurrentDiagonalSize * 0.5) {
+    if (least_distance < currentFrameBlob.current_diagonal_size_ * 0.5) {
       AddBlobToExistingBlobs(currentFrameBlob, existing_blobs,
                              index_least_distance);
     } else {
@@ -113,10 +113,10 @@ void Tools::AddBlobToExistingBlobs(Blob &currentFrameBlob,
   existing_blobs[index].center_positions_.push_back(
       currentFrameBlob.center_positions_.back());
 
-  existing_blobs[index].dblCurrentDiagonalSize =
-      currentFrameBlob.dblCurrentDiagonalSize;
-  existing_blobs[index].dblCurrentAspectRatio =
-      currentFrameBlob.dblCurrentAspectRatio;
+  existing_blobs[index].current_diagonal_size_ =
+      currentFrameBlob.current_diagonal_size_;
+  existing_blobs[index].current_aspect_ratio_ =
+      currentFrameBlob.current_aspect_ratio_;
 
   existing_blobs[index].still_being_tracked_ = true;
   existing_blobs[index].current_match_found_or_newblob_ = true;

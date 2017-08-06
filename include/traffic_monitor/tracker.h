@@ -21,27 +21,26 @@
 namespace traffic_monitor {
 
 class Tracker {
-  cv::VideoCapture capVideo;
+  cv::VideoCapture vid_capture_;
 
-  std::ofstream myfile;
+  std::ofstream log_file_;
 
   cv::Mat imgFrame1;
   cv::Mat imgFrame2;
   cv::Mat imgFrame1L;
   cv::Mat imgFrame2L;
 
-  std::vector<Blob> blobs;
+  std::vector<Blob> blobs_;
 
-  cv::Point crossingLine[2];
+  cv::Point crossing_line_[2];
 
-  int carCountL{0};
-  int carCountR{0};
-  bool blnFirstFrame = false;
-  char chCheckForEscKey{0};
+  int car_count_left{0};
+  int car_count_right{0};
+  bool first_frame = false;
 
-  int frameCount{0};
+  int frame_count_{0};
 
-  int intVerticalLinePosition{0};
+  int vertical_line_position_{0};
 
  public:
   Tracker();

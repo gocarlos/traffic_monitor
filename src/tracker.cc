@@ -10,8 +10,8 @@ Tracker::Tracker() {
   // capVideo.open("../movie.mp4");
   std::size_t num_cameras{0};
   for (std::size_t i = 0; i < 5; ++i) {
-    capVideo.open(i);
-    if (!capVideo.isOpened()) {
+    vid_capture_.open(i);
+    if (!vid_capture_.isOpened()) {
       ++num_cameras;
     }
   }
@@ -27,45 +27,46 @@ Tracker::~Tracker() {
 
 int Tracker::run() {
   // TODO(gocarlos) choose the camera or video here.
-  capVideo.open(0);
+  vid_capture_.open(0);
 
-  myfile.open("../logging/OpenCV-" + std::to_string(time(0)) + ".txt");
+  log_file_.open("../logging/OpenCV-" + std::to_string(time(0)) + ".txt");
   std::cout << "Logging to: \"/tmp/OpenCV-"
             << "-" << std::to_string(time(0)) << ".txt\"" << std::endl;
 
-  myfile << "\"Timestamp\",\"Left\",\"Right\"" << std::endl;
+  log_file_ << "\"Timestamp\",\"Left\",\"Right\"" << std::endl;
 
-  capVideo.read(imgFrame1L);
-  capVideo.read(imgFrame2L);
+  vid_capture_.read(imgFrame1L);
+  vid_capture_.read(imgFrame2L);
 
   resize(imgFrame1L, imgFrame1,
-         cv::Size(imgFrame1L.size().width / Settings::FRAME_SCALE,
-                  imgFrame1L.size().height / Settings::FRAME_SCALE));
+         cv::Size(imgFrame1L.size().width / Settings::frame_scale_,
+                  imgFrame1L.size().height / Settings::frame_scale_));
   resize(imgFrame2L, imgFrame2,
-         cv::Size(imgFrame2L.size().width / Settings::FRAME_SCALE,
-                  imgFrame2L.size().height / Settings::FRAME_SCALE));
+         cv::Size(imgFrame2L.size().width / Settings::frame_scale_,
+                  imgFrame2L.size().height / Settings::frame_scale_));
 
-  intVerticalLinePosition = std::round(imgFrame1.cols * 0.50f);
+  vertical_line_position_ = std::round(imgFrame1.cols * 0.50f);
 
-  crossingLine[0].y = 0;
-  crossingLine[0].x = intVerticalLinePosition;
+  crossing_line_[0].y = 0;
+  crossing_line_[0].x = vertical_line_position_;
 
-  crossingLine[1].y = imgFrame1.rows - 1;
-  crossingLine[1].x = intVerticalLinePosition;
+  crossing_line_[1].y = imgFrame1.rows - 1;
+  crossing_line_[1].x = vertical_line_position_;
 
-  frameCount = 2;
-  bool blnFirstFrame = true;
+  frame_count_ = 2;
+  bool first_frame = true;
+  char chCheckForEscKey{0};
 
   LOG(INFO) << "Entering the main loop.";
 
-  while (capVideo.isOpened() && chCheckForEscKey != 27) {
+  while (vid_capture_.isOpened() && chCheckForEscKey != 27) {
     std::vector<Blob> current_frame_blobs;
 
     cv::Mat imgFrame1Copy = imgFrame1.clone();
     cv::Mat imgFrame2Copy = imgFrame2.clone();
 
-    cv::Mat imgDifference;
-    cv::Mat imgThresh;
+    cv::Mat img_diff;
+    cv::Mat img_thresh;
 
     cv::cvtColor(imgFrame1Copy, imgFrame1Copy, CV_BGR2GRAY);
     cv::cvtColor(imgFrame2Copy, imgFrame2Copy, CV_BGR2GRAY);
@@ -73,9 +74,9 @@ int Tracker::run() {
     cv::GaussianBlur(imgFrame1Copy, imgFrame1Copy, cv::Size(5, 5), 0);
     cv::GaussianBlur(imgFrame2Copy, imgFrame2Copy, cv::Size(5, 5), 0);
 
-    cv::absdiff(imgFrame1Copy, imgFrame2Copy, imgDifference);
+    cv::absdiff(imgFrame1Copy, imgFrame2Copy, img_diff);
 
-    cv::threshold(imgDifference, imgThresh, 30, 255.0, CV_THRESH_BINARY);
+    cv::threshold(img_diff, img_thresh, 30, 255.0, CV_THRESH_BINARY);
 
     // cv::imshow("imgThresh", imgThresh);
 
@@ -88,78 +89,81 @@ int Tracker::run() {
     cv::Mat structuringElement15x15 =
         cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15));
 
-    for (unsigned int i = 0; i < 2; i++) {
-      cv::dilate(imgThresh, imgThresh, structuringElement5x5);
-      cv::dilate(imgThresh, imgThresh, structuringElement5x5);
-      cv::erode(imgThresh, imgThresh, structuringElement5x5);
+    for (std::size_t i = 0; i < 2; ++i) {
+      cv::dilate(img_thresh, img_thresh, structuringElement5x5);
+      cv::dilate(img_thresh, img_thresh, structuringElement5x5);
+      cv::erode(img_thresh, img_thresh, structuringElement5x5);
     }
 
-    cv::Mat imgThreshCopy = imgThresh.clone();
+    cv::Mat imgThreshCopy = img_thresh.clone();
 
     std::vector<std::vector<cv::Point>> contours;
 
     cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL,
                      cv::CHAIN_APPROX_SIMPLE);
 
-    Drawer::DrawAndShowContours(imgThresh.size(), contours, "imgContours");
+    Drawer::DrawAndShowContours(img_thresh.size(), contours, "imgContours");
 
-    std::vector<std::vector<cv::Point>> convexHulls(contours.size());
+    std::vector<std::vector<cv::Point>> convex_hulls(contours.size());
 
     for (unsigned int i = 0; i < contours.size(); i++) {
-      cv::convexHull(contours[i], convexHulls[i]);
+      cv::convexHull(contours[i], convex_hulls[i]);
     }
 
-    Drawer::DrawAndShowContours(imgThresh.size(), convexHulls,
+    Drawer::DrawAndShowContours(img_thresh.size(), convex_hulls,
                                 "imgConvexHulls");
 
-    for (auto &convexHull : convexHulls) {
-      Blob possibleBlob(convexHull);
+    for (auto &convexHull : convex_hulls) {
+      Blob possible_blob(convexHull);
 
-      if (possibleBlob.current_bounding_rect_.area() > 400 &&
-          possibleBlob.dblCurrentAspectRatio > 0.2 &&
-          possibleBlob.dblCurrentAspectRatio < 4.0 &&
-          possibleBlob.current_bounding_rect_.width > 30 &&
-          possibleBlob.current_bounding_rect_.height > 30 &&
-          possibleBlob.dblCurrentDiagonalSize > 60.0 &&
-          (cv::contourArea(possibleBlob.current_contour_) /
-           (double)possibleBlob.current_bounding_rect_.area()) > 0.50) {
-        current_frame_blobs.push_back(possibleBlob);
+      // TODO(gocarlos) put those in the settings file.
+      if (possible_blob.current_bounding_rect_.area() > 400 &&
+          possible_blob.current_aspect_ratio_ > 0.2 &&
+          possible_blob.current_aspect_ratio_ < 4.0 &&
+          possible_blob.current_bounding_rect_.width > 30 &&
+          possible_blob.current_bounding_rect_.height > 30 &&
+          possible_blob.current_diagonal_size_ > 60.0 &&
+          (cv::contourArea(possible_blob.current_contour_) /
+           (double)possible_blob.current_bounding_rect_.area()) > 0.50) {
+        current_frame_blobs.push_back(possible_blob);
       }
     }
 
-    Drawer::DrawAndShowContours(imgThresh.size(), current_frame_blobs,
+    Drawer::DrawAndShowContours(img_thresh.size(), current_frame_blobs,
                                 "imgCurrentFrameBlobs");
 
-    if (blnFirstFrame == true) {
+    if (first_frame == true) {
       for (auto &currentFrameBlob : current_frame_blobs) {
-        blobs.push_back(currentFrameBlob);
+        blobs_.push_back(currentFrameBlob);
       }
     } else {
-      Tools::MatchCurrentFrameBlobsToExistingBlobs(blobs, current_frame_blobs);
+      Tools::MatchCurrentFrameBlobsToExistingBlobs(blobs_, current_frame_blobs);
     }
 
-    Drawer::DrawAndShowContours(imgThresh.size(), blobs, "imgBlobs");
+    Drawer::DrawAndShowContours(img_thresh.size(), blobs_, "imgBlobs");
     // get another copy of frame 2 since we changed the previous frame 2 copy in
     // the processing above
     imgFrame2Copy = imgFrame2.clone();
 
-    Drawer::DrawBlobInfoOnImage(blobs, imgFrame2Copy);
+    Drawer::DrawBlobInfoOnImage(blobs_, imgFrame2Copy);
 
-    int blnAtLeastOneBlobCrossedTheLine =
+    int at_least_one_blob_crossed_line =
         traffic_monitor::Tools::CheckIfBlobsCrossedTheLine(
-            blobs, intVerticalLinePosition, carCountL, carCountR, myfile);
+            blobs_, vertical_line_position_, car_count_left, car_count_right,
+            log_file_);
 
-    if (blnAtLeastOneBlobCrossedTheLine == 1) {
-      cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_GREEN,
-               2);
-    } else if (blnAtLeastOneBlobCrossedTheLine == 2) {
-      cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_YELLOW,
-               2);
+    if (at_least_one_blob_crossed_line == 1) {
+      cv::line(imgFrame2Copy, crossing_line_[0], crossing_line_[1],
+               SCALAR_GREEN, 2);
+    } else if (at_least_one_blob_crossed_line == 2) {
+      cv::line(imgFrame2Copy, crossing_line_[0], crossing_line_[1],
+               SCALAR_YELLOW, 2);
     } else {
-      cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_BLUE, 2);
+      cv::line(imgFrame2Copy, crossing_line_[0], crossing_line_[1], SCALAR_BLUE,
+               2);
     }
 
-    Drawer::DrawCarCountOnImage(carCountL, carCountR, imgFrame2Copy);
+    Drawer::DrawCarCountOnImage(car_count_left, car_count_right, imgFrame2Copy);
 
     cv::imshow("imgFrame2Copy", imgFrame2Copy);
 
@@ -168,13 +172,13 @@ int Tracker::run() {
     // move frame 1 up to where frame 2 is
     imgFrame1 = imgFrame2.clone();
 
-    capVideo.read(imgFrame2L);
+    vid_capture_.read(imgFrame2L);
     resize(imgFrame2L, imgFrame2,
-           cv::Size(imgFrame2L.size().width / Settings::FRAME_SCALE,
-                    imgFrame2L.size().height / Settings::FRAME_SCALE));
+           cv::Size(imgFrame2L.size().width / Settings::frame_scale_,
+                    imgFrame2L.size().height / Settings::frame_scale_));
 
-    blnFirstFrame = false;
-    ++frameCount;
+    first_frame = false;
+    ++frame_count_;
     chCheckForEscKey = cv::waitKey(1);
   }
 

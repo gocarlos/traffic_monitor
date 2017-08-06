@@ -19,8 +19,8 @@ class Blob {
 
   std::vector<cv::Point> center_positions_;
 
-  double dblCurrentDiagonalSize;
-  double dblCurrentAspectRatio;
+  double current_diagonal_size_;
+  double current_aspect_ratio_;
 
   bool current_match_found_or_newblob_;
 

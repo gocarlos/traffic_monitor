@@ -18,7 +18,7 @@ class Tools {
   Tools();
   virtual ~Tools();
 
-  static double DistanceBetweenPoints(const cv::Point &point1,
+  static float DistanceBetweenPoints(const cv::Point &point1,
                                       const cv::Point &point2);
 
   static int CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,

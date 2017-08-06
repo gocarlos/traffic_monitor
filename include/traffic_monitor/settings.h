@@ -12,8 +12,6 @@
 
 #include <opencv2/core/core.hpp>
 
-//#define FRAME_SCALE 1  // divide frame dimensions by this number
-
 const cv::Scalar SCALAR_BLACK = cv::Scalar(0.0, 0.0, 0.0);
 const cv::Scalar SCALAR_WHITE = cv::Scalar(255.0, 255.0, 255.0);
 const cv::Scalar SCALAR_YELLOW = cv::Scalar(0.0, 255.0, 255.0);
@@ -27,10 +25,13 @@ class Settings {
  public:
   Settings();
   virtual ~Settings();
-  static std::string path_to_log_file;
+
+  static std::string path_to_log_file_;
   static bool with_gui_;
   static bool debug_mode_;
-  static int FRAME_SCALE;
+
+  // Divide frame dimensions by this number.
+  static int frame_scale_;
 };
 
 } /* namespace traffic_monitor */

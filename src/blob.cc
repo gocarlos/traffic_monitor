@@ -18,11 +18,11 @@ Blob::Blob(std::vector<cv::Point> _contour) {
 
   center_positions_.push_back(currentCenter);
 
-  dblCurrentDiagonalSize =
+  current_diagonal_size_ =
       std::sqrt((float)(std::pow(current_bounding_rect_.width, 2) +
                         std::pow(current_bounding_rect_.height, 2)));
 
-  dblCurrentAspectRatio = (float)current_bounding_rect_.width /
+  current_aspect_ratio_ = (float)current_bounding_rect_.width /
                           (float)current_bounding_rect_.height;
 
   still_being_tracked_ = true;

@@ -20,7 +20,7 @@ void Drawer::DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                     2);
 
       int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
-      double dblFontScale = blobs[i].dblCurrentDiagonalSize / 60.0;
+      double dblFontScale = blobs[i].current_diagonal_size_ / 60.0;
       int intFontThickness = (int)std::round((float)dblFontScale * 1.0f);
 
       cv::putText(imgFrame2Copy, std::to_string(i),
