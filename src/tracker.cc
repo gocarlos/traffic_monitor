@@ -24,7 +24,9 @@ Tracker::Tracker() {
 int Tracker::run() {
   // TODO(gocarlos) choose the camera or video here.
   vid_capture_.open(0);
-
+  
+  
+  // todo log to good directory
   log_file_.open("../logging/OpenCV-" + std::to_string(time(0)) + ".txt");
   std::cout << "Logging to: \"/tmp/OpenCV-"
             << "-" << std::to_string(time(0)) << ".txt\"" << std::endl;
@@ -96,7 +98,9 @@ int Tracker::run() {
     cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL,
                      cv::CHAIN_APPROX_SIMPLE);
 
-    Drawer::DrawAndShowContours(img_thresh.size(), contours, "imgContours");
+    if(Settings::with_gui_){
+      Drawer::DrawAndShowContours(img_thresh.size(), contours, "imgContours");
+      }
 
     std::vector<std::vector<cv::Point>> convex_hulls(contours.size());
 
@@ -104,6 +108,7 @@ int Tracker::run() {
       cv::convexHull(contours[i], convex_hulls[i]);
     }
 
+if(Settings::with_gui_)
     Drawer::DrawAndShowContours(img_thresh.size(), convex_hulls,
                                 "imgConvexHulls");
 
@@ -122,7 +127,8 @@ int Tracker::run() {
         current_frame_blobs.push_back(possible_blob);
       }
     }
-
+    
+if(Settings::with_gui_)
     Drawer::DrawAndShowContours(img_thresh.size(), current_frame_blobs,
                                 "imgCurrentFrameBlobs");
 
@@ -133,12 +139,15 @@ int Tracker::run() {
     } else {
       Tools::MatchCurrentFrameBlobsToExistingBlobs(blobs_, current_frame_blobs);
     }
-
+    
+if(Settings::with_gui_)
     Drawer::DrawAndShowContours(img_thresh.size(), blobs_, "imgBlobs");
+    
     // Get another copy of frame 2 since we changed the previous frame 2 copy in
     // the processing above
     imgFrame2Copy = imgFrame2.clone();
-
+    
+if(Settings::with_gui_)
     Drawer::DrawBlobInfoOnImage(blobs_, imgFrame2Copy);
 
     int at_least_one_blob_crossed_line =
@@ -156,7 +165,8 @@ int Tracker::run() {
       cv::line(imgFrame2Copy, crossing_line_[0], crossing_line_[1], SCALAR_BLUE,
                2);
     }
-
+    
+if(Settings::with_gui_)
     Drawer::DrawCarCountOnImage(car_count_left, car_count_right, imgFrame2Copy);
 
     cv::imshow("imgFrame2Copy", imgFrame2Copy);
@@ -174,8 +184,10 @@ int Tracker::run() {
     first_frame = false;
     ++frame_count_;
     chCheckForEscKey = cv::waitKey(1);
-  }
+    
+  } // while
 
+  // Untill ESC is pressed.
   if (chCheckForEscKey != 27) {
     // If the user did not press ESC (i.e. we reached the end of the video)
     // hold the windows open to allow the "end of video" message to show.

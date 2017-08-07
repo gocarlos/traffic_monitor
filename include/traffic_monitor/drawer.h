@@ -15,6 +15,7 @@ namespace traffic_monitor {
 
 class Drawer {
  public:
+ // todo make names shorter
   static void DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                                   cv::Mat &imgFrame2Copy);
 

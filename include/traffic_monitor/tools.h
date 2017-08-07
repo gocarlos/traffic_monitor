@@ -16,7 +16,7 @@ namespace traffic_monitor {
 class Tools {
  public:
   Tools();
-
+  // todo make the names shorter
   static float DistanceBetweenPoints(const cv::Point &point1,
                                      const cv::Point &point2);
 

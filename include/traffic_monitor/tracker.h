@@ -24,7 +24,7 @@ class Tracker {
   cv::VideoCapture vid_capture_;
 
   std::ofstream log_file_;
-
+  // todo refactor this code
   cv::Mat imgFrame1;
   cv::Mat imgFrame2;
   cv::Mat imgFrame1L;

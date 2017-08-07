@@ -1,0 +1,1 @@
+// todo(gocarlos) check if the host has a display e.g. can display windows

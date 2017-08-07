@@ -7,7 +7,6 @@ IF(NOT PROJECT_NAME)
   PROJECT(${TRAFFIC_MONITOR})
 ENDIF(NOT PROJECT_NAME)
 
-
 ADD_COMPILE_OPTIONS("-std=c++17")
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
@@ -38,6 +37,8 @@ FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
 # Remove the executable from that list.
 SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
+
+# todo(gocarlos) add here a library 
 
 ################################
 # Define Traffic Monitor Executable

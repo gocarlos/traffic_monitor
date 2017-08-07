@@ -13,6 +13,7 @@
 
 class Blob {
  public:
+ // todo make the name of those variables shorter
   std::vector<cv::Point> current_contour_;
 
   cv::Rect current_bounding_rect_;
