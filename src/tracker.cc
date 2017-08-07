@@ -74,8 +74,6 @@ int Tracker::run() {
 
     cv::threshold(img_diff, img_thresh, 30, 255.0, CV_THRESH_BINARY);
 
-    // cv::imshow("imgThresh", imgThresh);
-
     cv::Mat structuringElement3x3 =
         cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
     cv::Mat structuringElement5x5 =
@@ -137,7 +135,7 @@ int Tracker::run() {
     }
 
     Drawer::DrawAndShowContours(img_thresh.size(), blobs_, "imgBlobs");
-    // get another copy of frame 2 since we changed the previous frame 2 copy in
+    // Get another copy of frame 2 since we changed the previous frame 2 copy in
     // the processing above
     imgFrame2Copy = imgFrame2.clone();
 
@@ -179,8 +177,8 @@ int Tracker::run() {
   }
 
   if (chCheckForEscKey != 27) {
-    // if the user did not press esc (i.e. we reached the end of the video)
-    // hold the windows open to allow the "end of video" message to show
+    // If the user did not press ESC (i.e. we reached the end of the video)
+    // hold the windows open to allow the "end of video" message to show.
     cv::waitKey(0);
   }
   return 0;
