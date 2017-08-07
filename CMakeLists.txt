@@ -50,6 +50,24 @@ TARGET_LINK_LIBRARIES(traffic_monitor
 )
 
 ################################
+# Define Unit Tests
+################################
+
+enable_testing()
+find_package(GTest REQUIRED)
+
+SET(TEST_SRCS_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
+file(GLOB_RECURSE TEST_SRCS “${TEST_SRCS_DIR}/*.cc”)
+
+link_directories(${GTEST_LIBRARY_DIR})
+include_directories(${GTEST_INCLUDE_DIR})
+
+add_executable(unittests ${TEST_SRCS})
+target_link_libraries(unittests ${TM_LIB_RESOURCES})
+
+gtest_add_tests(unittests ${TEST_SRCS})
+
+################################
 # Install Traffic Monitor Executable
 ################################
 
