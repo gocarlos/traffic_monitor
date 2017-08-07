@@ -1,5 +1,20 @@
-# Car Counter app.
 
+<h1 align="center">
+  <img
+  src="https://raw.githubusercontent.com/vigilatore/traffic_monitor/master/snap/gui/icon.png" style="max-width:200px;">
+  <br />
+
+Traffic Monitor
+</h1>
+
+<p align="center"><b>This is the snap for Traffic Monitoring</b>, It works on Ubuntu, Fedora, Debian, and other major Linux
+distributions.</p>
+
+<br>
+<p align="center">Published for <img src="http://anything.codes/slack-emoji-for-techies/emoji/tux.png" align="top" width="24" /> with :gift_heart: </p>
+
+
+# Car Counter app.
 This app can be used to count the amount of traffic on a street. Its available as a Ubuntu snap and can therefore be installed on every newer (>2014 e.g. Ubuntu 14.04) machine. Install instructions can be found below. You can test the app with a video instead of web cam if you like.
 
 # Project status

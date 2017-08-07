@@ -28,6 +28,8 @@ before_script:
       - rosdep update
       - source /opt/ros/indigo/setup.bash
       - sudo apt-get install ros-indigo-opencv3 ros-indigo-eigen-conversions
+      - sudo pip3 install pafy # download tool for python.
+      - python3 test/get_test_data.py
 
 script:
   # Export CC and CXX to tell cmake which compiler to use
