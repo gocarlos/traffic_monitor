@@ -12,6 +12,7 @@ addons:
       - g++-7
       - cmake
       - python-dev
+      - python3-pip
       - python-numpy
       - libeigen3-dev
       # - freeglut3-dev # OpenGL
