@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 import pafy
 
-from vigilatore import vigilatore
-# from tests import test_data
-
 def download_test_video():
     # Download move from youtube
     url = "https://www.youtube.com/watch?v=gP5PupjD2po"
@@ -18,7 +15,6 @@ def download_test_video():
     print('test video downloaded')
 
 if __name__ == '__main__':
-    # Download data
     download_test_video()
 
 
