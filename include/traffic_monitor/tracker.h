@@ -43,6 +43,10 @@ class Tracker {
   int vertical_line_position_{0};
 
  public:
+  enum Input { camera, file } input_;
+  int camera_number_;
+  std::string video_path_;
+
   Tracker();
   int run();
 };

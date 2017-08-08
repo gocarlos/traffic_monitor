@@ -4,7 +4,7 @@
 
 namespace traffic_monitor {
 
-Tracker::Tracker() {
+Tracker::Tracker() : camera_number_(0), video_path_{""} {
   LOG(INFO) << "Setting up the tracker.";
 
   // capVideo.open("../movie.mp4");
@@ -23,9 +23,15 @@ Tracker::Tracker() {
 
 int Tracker::run() {
   // TODO(gocarlos) choose the camera or video here.
-  vid_capture_.open(0);
-  
-  
+
+  if (input_ == camera) {
+    vid_capture_.open(0);
+  } else if (input_ == file) {
+    vid_capture_.open(video_path_);
+  } else {
+    LOG(FATAL) << "input not set. ";
+  }
+
   // todo log to good directory
   log_file_.open("../logging/OpenCV-" + std::to_string(time(0)) + ".txt");
   std::cout << "Logging to: \"/tmp/OpenCV-"
@@ -98,9 +104,9 @@ int Tracker::run() {
     cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL,
                      cv::CHAIN_APPROX_SIMPLE);
 
-    if(Settings::with_gui_){
+    if (Settings::with_gui_) {
       Drawer::DrawAndShowContours(img_thresh.size(), contours, "imgContours");
-      }
+    }
 
     std::vector<std::vector<cv::Point>> convex_hulls(contours.size());
 
@@ -108,9 +114,10 @@ int Tracker::run() {
       cv::convexHull(contours[i], convex_hulls[i]);
     }
 
-if(Settings::with_gui_)
-    Drawer::DrawAndShowContours(img_thresh.size(), convex_hulls,
-                                "imgConvexHulls");
+    if (Settings::with_gui_) {
+      Drawer::DrawAndShowContours(img_thresh.size(), convex_hulls,
+                                  "imgConvexHulls");
+    }
 
     for (auto &convexHull : convex_hulls) {
       Blob possible_blob(convexHull);
@@ -127,11 +134,11 @@ if(Settings::with_gui_)
         current_frame_blobs.push_back(possible_blob);
       }
     }
-    
-if(Settings::with_gui_)
-    Drawer::DrawAndShowContours(img_thresh.size(), current_frame_blobs,
-                                "imgCurrentFrameBlobs");
 
+    if (Settings::with_gui_) {
+      Drawer::DrawAndShowContours(img_thresh.size(), current_frame_blobs,
+                                  "imgCurrentFrameBlobs");
+    }
     if (first_frame == true) {
       for (auto &currentFrameBlob : current_frame_blobs) {
         blobs_.push_back(currentFrameBlob);
@@ -139,17 +146,18 @@ if(Settings::with_gui_)
     } else {
       Tools::MatchCurrentFrameBlobsToExistingBlobs(blobs_, current_frame_blobs);
     }
-    
-if(Settings::with_gui_)
-    Drawer::DrawAndShowContours(img_thresh.size(), blobs_, "imgBlobs");
-    
+
+    if (Settings::with_gui_) {
+      Drawer::DrawAndShowContours(img_thresh.size(), blobs_, "imgBlobs");
+    }
+
     // Get another copy of frame 2 since we changed the previous frame 2 copy in
     // the processing above
     imgFrame2Copy = imgFrame2.clone();
-    
-if(Settings::with_gui_)
-    Drawer::DrawBlobInfoOnImage(blobs_, imgFrame2Copy);
 
+    if (Settings::with_gui_) {
+      Drawer::DrawBlobInfoOnImage(blobs_, imgFrame2Copy);
+    }
     int at_least_one_blob_crossed_line =
         traffic_monitor::Tools::CheckIfBlobsCrossedTheLine(
             blobs_, vertical_line_position_, car_count_left, car_count_right,
@@ -165,11 +173,13 @@ if(Settings::with_gui_)
       cv::line(imgFrame2Copy, crossing_line_[0], crossing_line_[1], SCALAR_BLUE,
                2);
     }
-    
-if(Settings::with_gui_)
-    Drawer::DrawCarCountOnImage(car_count_left, car_count_right, imgFrame2Copy);
 
-    cv::imshow("imgFrame2Copy", imgFrame2Copy);
+    if (Settings::with_gui_) {
+      Drawer::DrawCarCountOnImage(car_count_left, car_count_right,
+                                  imgFrame2Copy);
+
+      cv::imshow("imgFrame2Copy", imgFrame2Copy);
+    }
 
     current_frame_blobs.clear();
 
@@ -177,6 +187,10 @@ if(Settings::with_gui_)
     imgFrame1 = imgFrame2.clone();
 
     vid_capture_.read(imgFrame2L);
+    if (imgFrame2L.empty()) {
+      LOG(INFO) << "Assuming video file has ended.";
+      break;
+    }
     resize(imgFrame2L, imgFrame2,
            cv::Size(imgFrame2L.size().width / Settings::frame_scale_,
                     imgFrame2L.size().height / Settings::frame_scale_));
@@ -184,15 +198,15 @@ if(Settings::with_gui_)
     first_frame = false;
     ++frame_count_;
     chCheckForEscKey = cv::waitKey(1);
-    
-  } // while
 
-  // Untill ESC is pressed.
-  if (chCheckForEscKey != 27) {
-    // If the user did not press ESC (i.e. we reached the end of the video)
-    // hold the windows open to allow the "end of video" message to show.
-    cv::waitKey(0);
-  }
+  }  // while
+
+  //  // Untill ESC is pressed.
+  //  if (chCheckForEscKey != 27) {
+  //    // If the user did not press ESC (i.e. we reached the end of the video)
+  //    // hold the windows open to allow the "end of video" message to show.
+  //    cv::waitKey(0);
+  //  }
   return 0;
 }
 

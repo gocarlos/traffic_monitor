@@ -3,11 +3,12 @@ build/
 *.pydevproject
 .cproject
 .project
-
+movie.mp4
 
 CMakeFiles/
 CMakeCache.txt
 
+gtest_build/
 *.snap
 
 # Prerequisites
