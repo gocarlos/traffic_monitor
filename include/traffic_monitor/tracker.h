@@ -24,19 +24,19 @@ class Tracker {
   cv::VideoCapture vid_capture_;
 
   std::ofstream log_file_;
-  // todo refactor this code
-  cv::Mat imgFrame1;
-  cv::Mat imgFrame2;
-  cv::Mat imgFrame1L;
-  cv::Mat imgFrame2L;
+
+  cv::Mat img_frame_1_;
+  cv::Mat img_frame_2_;
+  cv::Mat img_frame_1_large_;
+  cv::Mat img_frame_2_large_;
 
   std::vector<Blob> blobs_;
 
   cv::Point crossing_line_[2];
 
-  int car_count_left{0};
-  int car_count_right{0};
-  bool first_frame = false;
+  int car_count_left_{0};
+  int car_count_right_{0};
+  bool first_frame_ = false;
 
   int frame_count_{0};
 
@@ -51,6 +51,6 @@ class Tracker {
   int run();
 };
 
-} /* namespace traffic_monitor */
+}  // namespace traffic_monitor
 
-#endif /* INCLUDE_TRAFFIC_MONITOR_TRACKER_H_ */
+#endif  // INCLUDE_TRAFFIC_MONITOR_TRACKER_H_

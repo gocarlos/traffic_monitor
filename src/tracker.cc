@@ -4,10 +4,9 @@
 
 namespace traffic_monitor {
 
-Tracker::Tracker() : camera_number_(0), video_path_{""} {
+Tracker::Tracker() : camera_number_(0), video_path_{""}, input_(camera){
   LOG(INFO) << "Setting up the tracker.";
 
-  // capVideo.open("../movie.mp4");
   std::size_t num_cameras{0};
   for (std::size_t i = 0; i < 5; ++i) {
     vid_capture_.open(i);
@@ -39,22 +38,22 @@ int Tracker::run() {
 
   log_file_ << "\"Timestamp\",\"Left\",\"Right\"" << std::endl;
 
-  vid_capture_.read(imgFrame1L);
-  vid_capture_.read(imgFrame2L);
+  vid_capture_.read(img_frame_1_large_);
+  vid_capture_.read(img_frame_2_large_);
 
-  resize(imgFrame1L, imgFrame1,
-         cv::Size(imgFrame1L.size().width / Settings::frame_scale_,
-                  imgFrame1L.size().height / Settings::frame_scale_));
-  resize(imgFrame2L, imgFrame2,
-         cv::Size(imgFrame2L.size().width / Settings::frame_scale_,
-                  imgFrame2L.size().height / Settings::frame_scale_));
+  resize(img_frame_1_large_, img_frame_1_,
+         cv::Size(img_frame_1_large_.size().width / Settings::frame_scale_,
+                  img_frame_1_large_.size().height / Settings::frame_scale_));
+  resize(img_frame_2_large_, img_frame_2_,
+         cv::Size(img_frame_2_large_.size().width / Settings::frame_scale_,
+                  img_frame_2_large_.size().height / Settings::frame_scale_));
 
-  vertical_line_position_ = std::round(imgFrame1.cols * 0.50f);
+  vertical_line_position_ = std::round(img_frame_1_.cols * 0.50f);
 
   crossing_line_[0].y = 0;
   crossing_line_[0].x = vertical_line_position_;
 
-  crossing_line_[1].y = imgFrame1.rows - 1;
+  crossing_line_[1].y = img_frame_1_.rows - 1;
   crossing_line_[1].x = vertical_line_position_;
 
   frame_count_ = 2;
@@ -66,8 +65,8 @@ int Tracker::run() {
   while (vid_capture_.isOpened() && chCheckForEscKey != 27) {
     std::vector<Blob> current_frame_blobs;
 
-    cv::Mat imgFrame1Copy = imgFrame1.clone();
-    cv::Mat imgFrame2Copy = imgFrame2.clone();
+    cv::Mat imgFrame1Copy = img_frame_1_.clone();
+    cv::Mat imgFrame2Copy = img_frame_2_.clone();
 
     cv::Mat img_diff;
     cv::Mat img_thresh;
@@ -153,14 +152,14 @@ int Tracker::run() {
 
     // Get another copy of frame 2 since we changed the previous frame 2 copy in
     // the processing above
-    imgFrame2Copy = imgFrame2.clone();
+    imgFrame2Copy = img_frame_2_.clone();
 
     if (Settings::with_gui_) {
       Drawer::DrawBlobInfoOnImage(blobs_, imgFrame2Copy);
     }
     int at_least_one_blob_crossed_line =
         traffic_monitor::Tools::CheckIfBlobsCrossedTheLine(
-            blobs_, vertical_line_position_, car_count_left, car_count_right,
+            blobs_, vertical_line_position_, car_count_left_, car_count_right_,
             log_file_);
 
     if (at_least_one_blob_crossed_line == 1) {
@@ -175,7 +174,7 @@ int Tracker::run() {
     }
 
     if (Settings::with_gui_) {
-      Drawer::DrawCarCountOnImage(car_count_left, car_count_right,
+      Drawer::DrawCarCountOnImage(car_count_left_, car_count_right_,
                                   imgFrame2Copy);
 
       cv::imshow("imgFrame2Copy", imgFrame2Copy);
@@ -184,22 +183,24 @@ int Tracker::run() {
     current_frame_blobs.clear();
 
     // move frame 1 up to where frame 2 is
-    imgFrame1 = imgFrame2.clone();
+    img_frame_1_ = img_frame_2_.clone();
 
-    vid_capture_.read(imgFrame2L);
-    if (imgFrame2L.empty()) {
+    vid_capture_.read(img_frame_2_large_);
+    if (img_frame_2_large_.empty()) {
       LOG(INFO) << "Assuming video file has ended.";
       break;
     }
-    resize(imgFrame2L, imgFrame2,
-           cv::Size(imgFrame2L.size().width / Settings::frame_scale_,
-                    imgFrame2L.size().height / Settings::frame_scale_));
+    resize(img_frame_2_large_, img_frame_2_,
+           cv::Size(img_frame_2_large_.size().width / Settings::frame_scale_,
+                    img_frame_2_large_.size().height / Settings::frame_scale_));
 
     first_frame = false;
     ++frame_count_;
     chCheckForEscKey = cv::waitKey(1);
 
   }  // while
+
+  log_file_.close();
 
   //  // Untill ESC is pressed.
   //  if (chCheckForEscKey != 27) {

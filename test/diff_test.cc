@@ -9,7 +9,7 @@
 
 namespace traffic_monitor {
 
-TEST(GetInitialPose, test_with_static_data) {
+TEST(IntegrationTests, tes_with_video_data) {
   Tracker tracker;
 
   tracker.input_ = Tracker::file;

@@ -28,7 +28,7 @@ int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
         carCountL++;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
-        ;
+
         LOG(INFO) << dt << ",1,0 (Left)";
         myfile << dt << ",1,0" << std::endl;
         blnAtLeastOneBlobCrossedTheLine = 1;
@@ -40,7 +40,7 @@ int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
         ++number_cars;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
-        ;
+
         LOG(INFO) << dt << ",0,1 (Right)" << std::endl;
         myfile << dt << ",0,1" << std::endl;
         blnAtLeastOneBlobCrossedTheLine = 2;
