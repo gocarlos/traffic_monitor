@@ -21,6 +21,7 @@ addons:
       # - libqt5opengl5
       # - libqt5opengl5-dev
       - libgtest-dev
+      - lcov # Code coverage: https://codecov.io/
 
 
 before_script:
