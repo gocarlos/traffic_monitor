@@ -12,7 +12,7 @@ apps:
     command:            desktop-launch ${SNAP}/bin/traffic_monitor
     plugs:              [home, unity7, x11, camera,network-bind, network-control, account-control]
 
-# TODO(gocarlos): check if all those dependencies are needed. 
+# TODO(gocarlos): check if all those dependencies are needed.
 parts:
   traffic-monitor:
     source-type:        git
@@ -21,10 +21,10 @@ parts:
     after:              [desktop-qt5]
     build-packages:
       - build-essential
-      - libopencv-dev
       - qt5-default
       - qtbase5-dev
       - libstdc++6
+      - libopencv-dev
       - libopencv-calib3d-dev
   desktop-qt5:
     # A set of Ubuntu packages to be downloaded and unpacked to join the part before it’s built. Note that these packages are not installed on the host. Like the rest of the part, all files from these packages will make it into the final snap unless filtered out via the prime keyword.

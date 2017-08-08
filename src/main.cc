@@ -1,6 +1,11 @@
 // (c) 2017 Vigilatore
 
 #include "cxxopts.hpp"
+
+//#include <QApplication>
+//#include <QDesktopWidget>
+#include "traffic_monitor/window.h"
+
 #include "traffic_monitor/settings.h"
 #include "traffic_monitor/tracker.h"
 
@@ -33,10 +38,30 @@ int main(int argc, char *argv[]) {
       << "Starting traffic monitor in debug mode";
   LOG(INFO) << "Path to logging file is: " << Settings::path_to_log_file_;
 
+
+//  Window window;
+//  QApplication app(argc, argv);
+//  window.resize(window.sizeHint());
+//  int desktopArea =
+//      QApplication::desktop()->width() * QApplication::desktop()->height();
+//  int widgetArea = window.width() * window.height();
+//
+//  window.setWindowTitle("Traffic Monitor Desktop");
+//
+//  if (((float)widgetArea / (float)desktopArea) < 0.75f) {
+//    window.show();
+//  } else {
+//    window.showMaximized();
+//  }
+//
+//  if (Settings::with_gui_) {
+//    return app.exec();
+//  }
+
   Tracker tracker;
 
-  tracker.input_ = Tracker::file;
-  tracker.video_path_ = "movie.mp4";
+  tracker.input_ = Tracker::camera;
+  tracker.camera_number_ = 0;
 
   return tracker.run();
 }

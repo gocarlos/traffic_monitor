@@ -1,14 +1,21 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 
 SET(TRAFFIC_MONITOR "TrafficMonitor")
-
-OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
-
 IF(NOT PROJECT_NAME)
   PROJECT(${TRAFFIC_MONITOR})
 ENDIF(NOT PROJECT_NAME)
 
+
 ADD_COMPILE_OPTIONS("-std=c++17")
+OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
+
+
+# Instruct CMake to run moc automatically when needed.
+#SET(CMAKE_AUTOMOC ON)
+#SET(CMAKE_AUTOUIC ON)
+# Find includes in corresponding build directories.
+#SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
@@ -17,9 +24,12 @@ SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_CURRENT_LIST_DIR}/external)
 
 FIND_PACKAGE(OpenCV REQUIRED)
+#FIND_PACKAGE(Qt5Widgets REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
+#  ${CMAKE_CURRENT_LIST_DIR}/include/traffic_monitor
+
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
   ${CMAKE_CURRENT_LIST_DIR}/external/argparse
   ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
@@ -66,7 +76,11 @@ SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 
 
-SET(TM_EXTERNAL_RESOURCES ${OpenCV_LIBRARIES} ${MINI_GLOG}
+SET(TM_EXTERNAL_RESOURCES
+  ${OpenCV_LIBRARIES}
+  ${MINI_GLOG}
+#  Qt5::Widgets
+#  Qt5::Core
 )
 
 # todo(gocarlos) add here a library
@@ -93,10 +107,9 @@ ENDIF(BUILD_TESTS)
 ################################
 
 INSTALL(
-   TARGETS traffic_monitor
-   RUNTIME DESTINATION bin
-   LIBRARY DESTINATION lib
-   )
+  TARGETS traffic_monitor
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+)
 
-# TODO(gocarlos) put the settings files there
-# INSTALL(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/data/ DESTINATION traffic_monitor)
+INSTALL(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/settings DESTINATION traffic_monitor)
