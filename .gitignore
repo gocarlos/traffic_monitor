@@ -45,3 +45,9 @@ CMakeCache.txt
 
 .idea/
 cmake-build-debug/
+
+*.includes
+*.files
+*.creator
+*.config
+*.user
