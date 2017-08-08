@@ -49,7 +49,7 @@ LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 
 ADD_EXECUTABLE(traffic_monitor ${TM_LIB_RESOURCES} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(traffic_monitor
-  ${TM_LIB} ${OpenCV_LIBRARIES} ${MINI_GLOG}
+  ${OpenCV_LIBRARIES} ${MINI_GLOG}
 )
 
 ################################
@@ -57,7 +57,6 @@ TARGET_LINK_LIBRARIES(traffic_monitor
 ################################
 
 IF(BUILD_TESTS)
-#  INCLUDE("${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
 
   # When building OpenMapper with ROS, gtest_main & gtest are already targets which are introduced automatically by catkin.
   # Here gtest is only built if there is not target called gtest_main, which means catkin is not providing already this target.
@@ -69,11 +68,6 @@ IF(BUILD_TESTS)
   ENABLE_TESTING()
   INCLUDE("${CMAKE_CURRENT_LIST_DIR}/cmake/FindGoogleTest.cmake")
   INCLUDE_DIRECTORIES(
-#    ${CMAKE_CURRENT_LIST_DIR}/include
-#    ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
-#    ${CMAKE_CURRENT_LIST_DIR}/external/argparse
-#    ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
-#    ${OpenCV_INCLUDE_DIRS}
     ${gtest_SOURCE_DIR}/include 
     ${gtest_SOURCE_DIR}
     )
@@ -87,15 +81,19 @@ IF(BUILD_TESTS)
     ${TM_TESTS_SOURCES}
     ${TM_LIB_RESOURCES}
   )
-  TARGET_LINK_LIBRARIES(${TM_TESTS}
-    GTEST_SOURCE_DIR
-  )
   
-  ADD_TEST(${TM_TESTS} ${TM_TESTS_HEADERS}
+ TARGET_LINK_LIBRARIES(${TM_TESTS}
+  ${OpenCV_LIBRARIES} ${MINI_GLOG}
+
+gtest pthread )
+  
+  ADD_TEST(${TM_TESTS} 
+    ${TM_TESTS_HEADERS}
     ${TM_TESTS_SOURCES}
+    ${TM_LIB_RESOURCES}    
   )
   
-  TARGET_INCLUDE_DIRECTORIES(${TM_TESTS} PUBLIC ../include)
+#  TARGET_INCLUDE_DIRECTORIES(${TM_TESTS} PUBLIC ../include)
   
   #SET_TARGET_PROPERTIES(${TM_TESTS} PROPERTIES
   #  DEBUG_POSTFIX "_d"

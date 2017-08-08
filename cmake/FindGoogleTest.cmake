@@ -29,3 +29,6 @@ set_property(TARGET gtest PROPERTY IMPORTED_LOCATION
              ${GTEST_LIBRARIES})
 set_property(TARGET googletest PROPERTY EXCLUDE_FROM_ALL 1)
 add_dependencies(gtest googletest)
+
+message("\ntata: GTEST_INCLUDE_DIRS " ${GTEST_INCLUDE_DIRS})
+message("\ntata: GTEST_LIBRARIES " ${GTEST_LIBRARIES})
