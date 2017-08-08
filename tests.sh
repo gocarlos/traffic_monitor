@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./test/unittests
+./build/traffic_monitor_tests
