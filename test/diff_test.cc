@@ -20,6 +20,9 @@ TEST(IntegrationTests, tes_with_video_data) {
 
   tracker.input_ = Tracker::file;
   tracker.video_path_ = path_to_file_;
+  // Travis supports testing of gui apps :
+  // http://craigthomas.ca/blog/2014/05/26/travis-ci-and-gui-testing/
+  Settings::with_gui_ = true;
 
   tracker.run();
   double maximal_distance = 0.1;

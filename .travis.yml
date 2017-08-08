@@ -1,8 +1,12 @@
 language:        c++
 sudo:            required
 dist:            trusty # 14.04
+# Test gui apps.
+env:
+  - DISPLAY=:99.0
 before_install:
   - sudo apt-get update
+  - sh -e /etc/init.d/xvfb start
 addons:
   apt:
     sources:
@@ -43,7 +47,7 @@ script:
   - $CC --version
   - $CXX --version
 
-  # Run build commands 
+  # Run build commands
   - ./.travis/travis_build.sh
   # Run unit tests
   - ./test/tests.sh
