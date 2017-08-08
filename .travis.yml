@@ -23,7 +23,6 @@ addons:
       - libgtest-dev
       - lcov # Code coverage: https://codecov.io/
 
-
 before_script:
       - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
       - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
@@ -34,7 +33,6 @@ before_script:
       - source /opt/ros/indigo/setup.bash
       - sudo apt-get install ros-indigo-opencv3 ros-indigo-eigen-conversions
       - sudo pip3 install pafy # download tool for python.
-      - python3 test/get_test_data.py
 
 script:
   # Export CC and CXX to tell cmake which compiler to use
@@ -47,3 +45,12 @@ script:
   # Run your build commands next
   - ./.travis/travis_build.sh
   - ./test/tests.sh
+
+
+after_success:
+  # Get code converage.
+  - cd ${TRAVIS_BUILD_DIR}
+  - lcov --directory . --capture --output-file coverage.info # capture coverage info
+  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
+  - lcov --list coverage.info #debug info
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports" # Uploading report to CodeCov
