@@ -45,5 +45,5 @@ script:
   - $CC --version
   - $CXX --version
   # Run your build commands next
-  - ./build.sh
+  - ./.travis/travis_build.sh
   - ./test/tests.sh
