@@ -1,0 +1,3 @@
+ignore:
+  - "external"   # ignore folders and all its contents
+  - "../external"   # ignore folders and all its contents
