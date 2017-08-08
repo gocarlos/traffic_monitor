@@ -4,8 +4,6 @@
 
 namespace traffic_monitor {
 
-Tools::Tools() {}
-
 float Tools::DistanceBetweenPoints(const cv::Point &point1,
                                    const cv::Point &point2) {
   return (std::sqrt(float(std::pow(std::abs(float(point1.x - point2.x)), 2) +
@@ -56,7 +54,7 @@ int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
 void Tools::MatchCurrentFrameBlobsToExistingBlobs(
     std::vector<Blob> &existing_blobs, std::vector<Blob> &current_frame_blobs) {
   for (auto &existing_blob : existing_blobs) {
-    existing_blob.current_match_found_or_newblob_ = false;
+    existing_blob.curr_match_found_or_newblob_ = false;
 
     existing_blob.PredictNextPosition();
   }
@@ -87,7 +85,7 @@ void Tools::MatchCurrentFrameBlobsToExistingBlobs(
   }
 
   for (auto &existingBlob : existing_blobs) {
-    if (existingBlob.current_match_found_or_newblob_ == false) {
+    if (existingBlob.curr_match_found_or_newblob_ == false) {
       existingBlob.num_consecutive_frames_without_match_++;
     }
 
@@ -113,12 +111,12 @@ void Tools::AddBlobToExistingBlobs(Blob &currentFrameBlob,
       currentFrameBlob.current_aspect_ratio_;
 
   existing_blobs[index].still_being_tracked_ = true;
-  existing_blobs[index].current_match_found_or_newblob_ = true;
+  existing_blobs[index].curr_match_found_or_newblob_ = true;
 }
 
 void Tools::AddNewBlob(Blob &currentFrameBlob,
                        std::vector<Blob> &existingBlobs) {
-  currentFrameBlob.current_match_found_or_newblob_ = true;
+  currentFrameBlob.curr_match_found_or_newblob_ = true;
 
   existingBlobs.push_back(currentFrameBlob);
 }

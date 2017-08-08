@@ -23,7 +23,7 @@ class Blob {
   double current_diagonal_size_;
   double current_aspect_ratio_;
 
-  bool current_match_found_or_newblob_;
+  bool curr_match_found_or_newblob_;
 
   bool still_being_tracked_;
 

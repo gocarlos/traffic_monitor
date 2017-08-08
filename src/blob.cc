@@ -26,7 +26,7 @@ Blob::Blob(std::vector<cv::Point> _contour) {
       current_bounding_rect_.width / current_bounding_rect_.height;
 
   still_being_tracked_ = true;
-  current_match_found_or_newblob_ = true;
+  curr_match_found_or_newblob_ = true;
 
   num_consecutive_frames_without_match_ = 0;
 }
