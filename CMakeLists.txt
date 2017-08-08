@@ -2,6 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 
 SET(TRAFFIC_MONITOR "TrafficMonitor")
 
+OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
+
 IF(NOT PROJECT_NAME)
   PROJECT(${TRAFFIC_MONITOR})
 ENDIF(NOT PROJECT_NAME)
@@ -28,6 +30,29 @@ INCLUDE("${CMAKE_CURRENT_LIST_DIR}/external/miniglog/CMakeLists.txt")
 
 SET(TM_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+
+
+IF(DO_COVERAGE_TEST)
+  MESSAGE("\nGoing to build the coverage tests.\n\n\n")
+  INCLUDE(CodeCoverage)
+  SETUP_TARGET_FOR_COVERAGE(${PROJECT_NAME}_coverage tests coverage)
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
+ELSE()
+  MESSAGE("\nNot building the coverage tests. \n\n\n")
+
+  # Optimize the code with the compiler if the target device has a x86 processor and not doing code coverage tests.
+  IF(CMAKE_SYSTEM_PROCESSOR MATCHES "amd64.*|x86_64.*|AMD64.*|i686.*|i386.*|x86.*")
+    MESSAGE("Current System is x86.")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+  ENDIF()
+
+  IF(NOT CMAKE_BUILD_TYPE)
+    SET(CMAKE_BUILD_TYPE Release)
+  ENDIF()
+
+ENDIF()
 
 ################################
 # Define Traffic Monitor Ressources
@@ -60,39 +85,7 @@ TARGET_LINK_LIBRARIES(traffic_monitor
 ################################
 
 IF(BUILD_TESTS)
-
-  SET(TM_TESTS "traffic_monitor_tests")
-
-  ENABLE_TESTING()
-  INCLUDE("${CMAKE_CURRENT_LIST_DIR}/cmake/FindGoogleTest.cmake")
-  INCLUDE_DIRECTORIES(
-    ${gtest_SOURCE_DIR}/include
-    ${gtest_SOURCE_DIR}
-    )
-
-  FILE(GLOB_RECURSE TM_TESTS_HEADERS "${CMAKE_CURRENT_LIST_DIR}/test/*.h")
-  FILE(GLOB_RECURSE TM_TESTS_SOURCES "${CMAKE_CURRENT_LIST_DIR}/test/*.cc")
-
-  # Add test src files
-  ADD_EXECUTABLE(${TM_TESTS}
-    ${TM_TESTS_HEADERS}
-    ${TM_TESTS_SOURCES}
-    ${TM_LIB_RESOURCES}
-  )
-
- TARGET_LINK_LIBRARIES(${TM_TESTS}
-#  ${OpenCV_LIBRARIES} ${MINI_GLOG}
-    ${TM_EXTERNAL_RESOURCES}
-  
-  gtest pthread
-  )
-
-  ADD_TEST(${TM_TESTS}
-    ${TM_TESTS_HEADERS}
-    ${TM_TESTS_SOURCES}
-    ${TM_LIB_RESOURCES}
-  )
-
+  INCLUDE("${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
 ENDIF(BUILD_TESTS)
 
 ################################

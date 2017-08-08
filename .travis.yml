@@ -45,4 +45,4 @@ script:
   - $CXX --version
   # Run your build commands next
   - ./build.sh
-  - ./tests.sh
+  - ./test/tests.sh
