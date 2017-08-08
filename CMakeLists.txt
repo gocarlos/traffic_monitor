@@ -12,6 +12,9 @@ ADD_COMPILE_OPTIONS("-std=c++17")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_CURRENT_LIST_DIR}/external)
+
 FIND_PACKAGE(OpenCV REQUIRED)
 
 INCLUDE_DIRECTORIES(
@@ -53,19 +56,56 @@ TARGET_LINK_LIBRARIES(traffic_monitor
 # Define Unit Tests
 ################################
 
-enable_testing()
-find_package(GTest REQUIRED)
+IF(BUILD_TESTS)
+#  INCLUDE("${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt")
 
-SET(TEST_SRCS_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
-file(GLOB_RECURSE TEST_SRCS “${TEST_SRCS_DIR}/*.cc”)
+  # When building OpenMapper with ROS, gtest_main & gtest are already targets which are introduced automatically by catkin.
+  # Here gtest is only built if there is not target called gtest_main, which means catkin is not providing already this target.
+  # Similiar problem: https://stackoverflow.com/questions/42550873/compile-gtest-from-source-with-catkin
+  # See documentation for policy CMP0002.
+  
+  SET(TM_TESTS "traffic_monitor_tests")
 
-link_directories(${GTEST_LIBRARY_DIR})
-include_directories(${GTEST_INCLUDE_DIR})
-
-add_executable(unittests ${TEST_SRCS})
-target_link_libraries(unittests ${TM_LIB_RESOURCES})
-
-gtest_add_tests(unittests ${TEST_SRCS})
+  ENABLE_TESTING()
+  INCLUDE("${CMAKE_CURRENT_LIST_DIR}/cmake/FindGoogleTest.cmake")
+  INCLUDE_DIRECTORIES(
+#    ${CMAKE_CURRENT_LIST_DIR}/include
+#    ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
+#    ${CMAKE_CURRENT_LIST_DIR}/external/argparse
+#    ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
+#    ${OpenCV_INCLUDE_DIRS}
+    ${gtest_SOURCE_DIR}/include 
+    ${gtest_SOURCE_DIR}
+    )
+  
+  FILE(GLOB_RECURSE TM_TESTS_HEADERS "${CMAKE_CURRENT_LIST_DIR}/test/*.h")
+  FILE(GLOB_RECURSE TM_TESTS_SOURCES "${CMAKE_CURRENT_LIST_DIR}/test/*.cc")
+  
+  # Add test src files
+  ADD_EXECUTABLE(${TM_TESTS}
+    ${TM_TESTS_HEADERS}
+    ${TM_TESTS_SOURCES}
+    ${TM_LIB_RESOURCES}
+  )
+  TARGET_LINK_LIBRARIES(${TM_TESTS}
+    GTEST_SOURCE_DIR
+  )
+  
+  ADD_TEST(${TM_TESTS} ${TM_TESTS_HEADERS}
+    ${TM_TESTS_SOURCES}
+  )
+  
+  TARGET_INCLUDE_DIRECTORIES(${TM_TESTS} PUBLIC ../include)
+  
+  #SET_TARGET_PROPERTIES(${TM_TESTS} PROPERTIES
+  #  DEBUG_POSTFIX "_d"
+  #  RUNTIME_OUTPUT_DIRECTORY ../bin/
+  #  RUNTIME_OUTPUT_DIRECTORY_DEBUG ../bin/
+  #  RUNTIME_OUTPUT_DIRECTORY_RELEASE ../bin/
+  #  RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ../bin/
+  #)
+  
+ENDIF(BUILD_TESTS)
 
 ################################
 # Install Traffic Monitor Executable
