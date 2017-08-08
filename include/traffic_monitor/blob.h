@@ -14,14 +14,14 @@
 class Blob {
  public:
  // todo make the name of those variables shorter
-  std::vector<cv::Point> current_contour_;
+  std::vector<cv::Point> curr_contour_;
 
-  cv::Rect current_bounding_rect_;
+  cv::Rect curr_bounding_rect_;
 
   std::vector<cv::Point> center_positions_;
 
-  double current_diagonal_size_;
-  double current_aspect_ratio_;
+  double curr_diagonal_size_;
+  double curr_aspect_ratio_;
 
   bool curr_match_found_or_newblob_;
 

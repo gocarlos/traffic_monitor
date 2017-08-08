@@ -11,44 +11,46 @@ float Tools::DistanceBetweenPoints(const cv::Point &point1,
 }
 
 int Tools::CheckIfBlobsCrossedTheLine(std::vector<Blob> &blobs,
-                                      int &intVerticalLinePosition,
-                                      int &carCountL, int &number_cars,
-                                      std::ofstream &myfile) {
-  int blnAtLeastOneBlobCrossedTheLine = 0;
+                                      int &vertical_line_position,
+                                      int &car_count_left, int &number_cars,
+                                      std::ofstream &log_file) {
+  int at_least_1_blob_crossed_line = 0;
 
   for (auto blob : blobs) {
     if (blob.still_being_tracked_ == true &&
         blob.center_positions_.size() >= 2) {
-      int prevFrameIndex = (int)blob.center_positions_.size() - 2;
-      int currFrameIndex = (int)blob.center_positions_.size() - 1;
+      int prev_frame_index = (int)blob.center_positions_.size() - 2;
+      int curr_frame_index = (int)blob.center_positions_.size() - 1;
 
       // Going left.
-      if (blob.center_positions_[prevFrameIndex].x > intVerticalLinePosition &&
-          blob.center_positions_[currFrameIndex].x <= intVerticalLinePosition) {
-        carCountL++;
+      if (blob.center_positions_[prev_frame_index].x > vertical_line_position &&
+          blob.center_positions_[curr_frame_index].x <=
+              vertical_line_position) {
+        ++car_count_left;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
 
         LOG(INFO) << dt << ",1,0 (Left)";
-        myfile << dt << ",1,0" << std::endl;
-        blnAtLeastOneBlobCrossedTheLine = 1;
+        log_file << dt << ",1,0" << std::endl;
+        at_least_1_blob_crossed_line = 1;
       }
 
       // Going right.
-      if (blob.center_positions_[prevFrameIndex].x < intVerticalLinePosition &&
-          blob.center_positions_[currFrameIndex].x >= intVerticalLinePosition) {
+      if (blob.center_positions_[prev_frame_index].x < vertical_line_position &&
+          blob.center_positions_[curr_frame_index].x >=
+              vertical_line_position) {
         ++number_cars;
         time_t now = time(0);
         char *dt = strtok(ctime(&now), "\n");
 
         LOG(INFO) << dt << ",0,1 (Right)" << std::endl;
-        myfile << dt << ",0,1" << std::endl;
-        blnAtLeastOneBlobCrossedTheLine = 2;
+        log_file << dt << ",0,1" << std::endl;
+        at_least_1_blob_crossed_line = 2;
       }
     }
   }
 
-  return blnAtLeastOneBlobCrossedTheLine;
+  return at_least_1_blob_crossed_line;
 }
 
 void Tools::MatchCurrentFrameBlobsToExistingBlobs(
@@ -65,18 +67,18 @@ void Tools::MatchCurrentFrameBlobsToExistingBlobs(
 
     for (std::size_t i = 0; i < existing_blobs.size(); ++i) {
       if (existing_blobs[i].still_being_tracked_ == true) {
-        double dblDistance = traffic_monitor::Tools::DistanceBetweenPoints(
+        double blob_distance = traffic_monitor::Tools::DistanceBetweenPoints(
             currentFrameBlob.center_positions_.back(),
             existing_blobs[i].predicted_next_position_);
 
-        if (dblDistance < least_distance) {
-          least_distance = dblDistance;
+        if (blob_distance < least_distance) {
+          least_distance = blob_distance;
           index_least_distance = i;
         }
       }
     }
 
-    if (least_distance < currentFrameBlob.current_diagonal_size_ * 0.5) {
+    if (least_distance < currentFrameBlob.curr_diagonal_size_ * 0.5) {
       AddBlobToExistingBlobs(currentFrameBlob, existing_blobs,
                              index_least_distance);
     } else {
@@ -84,41 +86,41 @@ void Tools::MatchCurrentFrameBlobsToExistingBlobs(
     }
   }
 
-  for (auto &existingBlob : existing_blobs) {
-    if (existingBlob.curr_match_found_or_newblob_ == false) {
-      existingBlob.num_consecutive_frames_without_match_++;
+  for (auto &existing_blob : existing_blobs) {
+    if (existing_blob.curr_match_found_or_newblob_ == false) {
+      ++existing_blob.num_consecutive_frames_without_match_;
     }
 
-    if (existingBlob.num_consecutive_frames_without_match_ >= 5) {
-      existingBlob.still_being_tracked_ = false;
+    if (existing_blob.num_consecutive_frames_without_match_ >= 5) {
+      existing_blob.still_being_tracked_ = false;
     }
   }
 }
 
-void Tools::AddBlobToExistingBlobs(Blob &currentFrameBlob,
+void Tools::AddBlobToExistingBlobs(Blob &current_frame_blob,
                                    std::vector<Blob> &existing_blobs,
                                    int &index) {
-  existing_blobs[index].current_contour_ = currentFrameBlob.current_contour_;
-  existing_blobs[index].current_bounding_rect_ =
-      currentFrameBlob.current_bounding_rect_;
+  existing_blobs[index].curr_contour_ = current_frame_blob.curr_contour_;
+  existing_blobs[index].curr_bounding_rect_ =
+      current_frame_blob.curr_bounding_rect_;
 
   existing_blobs[index].center_positions_.push_back(
-      currentFrameBlob.center_positions_.back());
+      current_frame_blob.center_positions_.back());
 
-  existing_blobs[index].current_diagonal_size_ =
-      currentFrameBlob.current_diagonal_size_;
-  existing_blobs[index].current_aspect_ratio_ =
-      currentFrameBlob.current_aspect_ratio_;
+  existing_blobs[index].curr_diagonal_size_ =
+      current_frame_blob.curr_diagonal_size_;
+  existing_blobs[index].curr_aspect_ratio_ =
+      current_frame_blob.curr_aspect_ratio_;
 
   existing_blobs[index].still_being_tracked_ = true;
   existing_blobs[index].curr_match_found_or_newblob_ = true;
 }
 
-void Tools::AddNewBlob(Blob &currentFrameBlob,
+void Tools::AddNewBlob(Blob &current_frame_blob,
                        std::vector<Blob> &existingBlobs) {
-  currentFrameBlob.curr_match_found_or_newblob_ = true;
+  current_frame_blob.curr_match_found_or_newblob_ = true;
 
-  existingBlobs.push_back(currentFrameBlob);
+  existingBlobs.push_back(current_frame_blob);
 }
 
 } /* namespace traffic_monitor */

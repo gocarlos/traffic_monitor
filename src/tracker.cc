@@ -122,14 +122,14 @@ int Tracker::run() {
       Blob possible_blob(convexHull);
 
       // TODO(gocarlos) put those in the settings file.
-      if (possible_blob.current_bounding_rect_.area() > 400 &&
-          possible_blob.current_aspect_ratio_ > 0.2 &&
-          possible_blob.current_aspect_ratio_ < 4.0 &&
-          possible_blob.current_bounding_rect_.width > 30 &&
-          possible_blob.current_bounding_rect_.height > 30 &&
-          possible_blob.current_diagonal_size_ > 60.0 &&
-          (cv::contourArea(possible_blob.current_contour_) /
-           (double)possible_blob.current_bounding_rect_.area()) > 0.50) {
+      if (possible_blob.curr_bounding_rect_.area() > 400 &&
+          possible_blob.curr_aspect_ratio_ > 0.2 &&
+          possible_blob.curr_aspect_ratio_ < 4.0 &&
+          possible_blob.curr_bounding_rect_.width > 30 &&
+          possible_blob.curr_bounding_rect_.height > 30 &&
+          possible_blob.curr_diagonal_size_ > 60.0 &&
+          (cv::contourArea(possible_blob.curr_contour_) /
+           (double)possible_blob.curr_bounding_rect_.area()) > 0.50) {
         current_frame_blobs.push_back(possible_blob);
       }
     }

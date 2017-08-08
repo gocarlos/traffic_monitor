@@ -8,11 +8,11 @@ void Drawer::DrawBlobInfoOnImage(std::vector<Blob> &blobs,
                                  cv::Mat &imgFrame2Copy) {
   for (std::size_t i = 0; i < blobs.size(); ++i) {
     if (blobs[i].still_being_tracked_ == true) {
-      cv::rectangle(imgFrame2Copy, blobs[i].current_bounding_rect_, SCALAR_RED,
+      cv::rectangle(imgFrame2Copy, blobs[i].curr_bounding_rect_, SCALAR_RED,
                     2);
 
       int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
-      double dblFontScale = blobs[i].current_diagonal_size_ / 60.0;
+      double dblFontScale = blobs[i].curr_diagonal_size_ / 60.0;
       int intFontThickness = (int)std::round((float)dblFontScale * 1.0f);
 
       cv::putText(imgFrame2Copy, std::to_string(i),
@@ -71,7 +71,7 @@ void Drawer::DrawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs,
 
   for (auto &blob : blobs) {
     if (blob.still_being_tracked_ == true) {
-      contours.push_back(blob.current_contour_);
+      contours.push_back(blob.curr_contour_);
     }
   }
 

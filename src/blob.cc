@@ -3,27 +3,27 @@
 #include <traffic_monitor/blob.h>
 
 Blob::Blob(std::vector<cv::Point> _contour) {
-  current_contour_ = _contour;
+  curr_contour_ = _contour;
 
-  current_bounding_rect_ = cv::boundingRect(current_contour_);
+  curr_bounding_rect_ = cv::boundingRect(curr_contour_);
 
   cv::Point current_center;
 
-  current_center.x = (current_bounding_rect_.x + current_bounding_rect_.x +
-                      current_bounding_rect_.width) /
+  current_center.x = (curr_bounding_rect_.x + curr_bounding_rect_.x +
+                      curr_bounding_rect_.width) /
                      2;
-  current_center.y = (current_bounding_rect_.y + current_bounding_rect_.y +
-                      current_bounding_rect_.height) /
+  current_center.y = (curr_bounding_rect_.y + curr_bounding_rect_.y +
+                      curr_bounding_rect_.height) /
                      2;
 
   center_positions_.push_back(current_center);
 
-  current_diagonal_size_ =
-      std::sqrt((float)(std::pow(current_bounding_rect_.width, 2) +
-                        std::pow(current_bounding_rect_.height, 2)));
+  curr_diagonal_size_ =
+      std::sqrt((float)(std::pow(curr_bounding_rect_.width, 2) +
+                        std::pow(curr_bounding_rect_.height, 2)));
 
-  current_aspect_ratio_ =
-      current_bounding_rect_.width / current_bounding_rect_.height;
+  curr_aspect_ratio_ =
+      curr_bounding_rect_.width / curr_bounding_rect_.height;
 
   still_being_tracked_ = true;
   curr_match_found_or_newblob_ = true;
