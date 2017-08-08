@@ -40,6 +40,10 @@ FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
 SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 
+
+SET(TM_EXTERNAL_RESOURCES ${OpenCV_LIBRARIES} ${MINI_GLOG}
+)
+
 # todo(gocarlos) add here a library
 
 ################################
@@ -48,7 +52,7 @@ LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 
 ADD_EXECUTABLE(traffic_monitor ${TM_LIB_RESOURCES} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(traffic_monitor
-  ${OpenCV_LIBRARIES} ${MINI_GLOG}
+  ${TM_EXTERNAL_RESOURCES}
 )
 
 ################################
@@ -56,11 +60,6 @@ TARGET_LINK_LIBRARIES(traffic_monitor
 ################################
 
 IF(BUILD_TESTS)
-
-  # When building OpenMapper with ROS, gtest_main & gtest are already targets which are introduced automatically by catkin.
-  # Here gtest is only built if there is not target called gtest_main, which means catkin is not providing already this target.
-  # Similiar problem: https://stackoverflow.com/questions/42550873/compile-gtest-from-source-with-catkin
-  # See documentation for policy CMP0002.
 
   SET(TM_TESTS "traffic_monitor_tests")
 
@@ -82,8 +81,11 @@ IF(BUILD_TESTS)
   )
 
  TARGET_LINK_LIBRARIES(${TM_TESTS}
-  ${OpenCV_LIBRARIES} ${MINI_GLOG}
-gtest pthread )
+#  ${OpenCV_LIBRARIES} ${MINI_GLOG}
+    ${TM_EXTERNAL_RESOURCES}
+  
+  gtest pthread
+  )
 
   ADD_TEST(${TM_TESTS}
     ${TM_TESTS_HEADERS}
