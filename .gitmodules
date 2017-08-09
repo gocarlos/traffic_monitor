@@ -4,3 +4,6 @@
 [submodule "external/Simple-Web-Server"]
 	path = external/Simple-Web-Server
 	url = https://github.com/vigilatore/Simple-Web-Server.git
+[submodule "external/Simple-WebSocket-Server"]
+	path = external/Simple-WebSocket-Server
+	url = https://github.com/vigilatore/Simple-WebSocket-Server.git
