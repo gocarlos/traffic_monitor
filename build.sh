@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#rm -rf build/
+rm -rf build/
 
 # Build traffic_monitor
 mkdir -p build

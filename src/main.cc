@@ -1,10 +1,13 @@
 // (c) 2017 Vigilatore
 
+#include <algorithm>
 #include <fstream>
 #include <vector>
-#include <algorithm>
 
 #include "cxxopts.hpp"
+
+#include "client_ws.hpp"
+#include "server_ws.hpp"
 
 #include "client_http.hpp"
 #include "server_http.hpp"
@@ -25,17 +28,72 @@ using namespace std;
 using namespace boost::property_tree;
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
 typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
+typedef SimpleWeb::SocketServer<SimpleWeb::WS> WsServer;
+typedef SimpleWeb::SocketClient<SimpleWeb::WS> WsClient;
 
 int RunServer() {
+  //  LOG(INFO) << "Starting the Websocket Server.";
+  WsServer ws_server;
+  ws_server.config.port = 8090;
+  auto &echo = ws_server.endpoint["^/echo/?$"];
 
-  HttpServer server;
-  server.config.port = 8080;
+  echo.on_message = [](shared_ptr<WsServer::Connection> connection,
+                       shared_ptr<WsServer::Message> message) {
+    auto message_str = message->string();
 
-  server.default_resource["GET"] = [](
+    cout << "Server: Message received: \"" << message_str << "\" from "
+         << connection.get() << endl;
+
+    cout << "Server: Sending message \"" << message_str << "\" to "
+         << connection.get() << endl;
+
+    auto send_stream = make_shared<WsServer::SendStream>();
+    *send_stream << message_str;
+    // connection->send is an asynchronous function
+    connection->send(send_stream, [](const SimpleWeb::error_code &ec) {
+      if (ec) {
+        cout << "Server: Error sending message. " <<
+            // See
+            // http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
+            // Error Codes for error code meanings
+            "Error: " << ec << ", error message: " << ec.message() << endl;
+      }
+    });
+
+    // Alternatively, using a convenience function:
+    // connection->send(message_str, [](const SimpleWeb::error_code & /*ec*/) {
+    // /*handle error*/ });
+  };
+
+  echo.on_open = [](shared_ptr<WsServer::Connection> connection) {
+    cout << "Server: Opened connection " << connection.get() << endl;
+  };
+
+  // See RFC 6455 7.4.1. for status codes
+  echo.on_close = [](shared_ptr<WsServer::Connection> connection, int status,
+                     const string & /*reason*/) {
+    cout << "Server: Closed connection " << connection.get()
+         << " with status code " << status << endl;
+  };
+
+  // See
+  // http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
+  // Error Codes for error code meanings
+  echo.on_error = [](shared_ptr<WsServer::Connection> connection,
+                     const SimpleWeb::error_code &ec) {
+    cout << "Server: Error in connection " << connection.get() << ". "
+         << "Error: " << ec << ", error message: " << ec.message() << endl;
+  };
+
+  //  LOG(INFO) << "Starting the HTTP Server.";
+  HttpServer http_server;
+  http_server.config.port = 8080;
+
+  http_server.default_resource["GET"] = [](
       std::shared_ptr<HttpServer::Response> response,
       shared_ptr<HttpServer::Request> request) {
     try {
-      auto web_root_path = boost::filesystem::canonical("web");
+      auto web_root_path = boost::filesystem::canonical("webserver");
       auto path = boost::filesystem::canonical(web_root_path / request->path);
       // Check if path is within web_root_path
       if (distance(web_root_path.begin(), web_root_path.end()) >
@@ -117,21 +175,27 @@ int RunServer() {
     }
   };
 
-  server.on_error = [](shared_ptr<HttpServer::Request> /*request*/,
-                       const SimpleWeb::error_code & /*ec*/) {
+  http_server.on_error = [](shared_ptr<HttpServer::Request> /*request*/,
+                            const SimpleWeb::error_code & /*ec*/) {
     // Handle errors here
   };
 
-  thread server_thread([&server]() {
+  thread http_server_thread([&http_server]() {
     // Start server
-    server.start();
+    LOG(INFO) << "Webserver started";
+    http_server.start();
   });
 
+  thread ws_server_thread([&ws_server]() {
+    // Start WS-server
+    LOG(INFO) << "Websocketsserver started";
+    ws_server.start();
+  });
   // Wait for server to start so that the client can connect
   this_thread::sleep_for(chrono::seconds(1));
 
-  server_thread.join();
-
+  http_server_thread.join();
+  ws_server_thread.join();
   return 0;
 }
 
@@ -162,10 +226,12 @@ int main(int argc, char *argv[]) {
       << "Starting traffic monitor in debug mode";
   LOG(INFO) << "Path to logging file is: " << Settings::path_to_log_file_;
 
-  Tracker tracker;
+  //  Tracker tracker;
 
-  tracker.input_ = Tracker::camera;
-  tracker.camera_number_ = 0;
+  //  tracker.input_ = Tracker::camera;
+  //  tracker.camera_number_ = 0;
+  //  tracker.run();
   RunServer();
-  return tracker.run();
+
+  return 0;
 }

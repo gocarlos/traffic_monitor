@@ -27,6 +27,7 @@ set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_CURRENT_LIST_DIR}/external
 
 FIND_PACKAGE(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
@@ -34,7 +35,8 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
   ${CMAKE_CURRENT_LIST_DIR}/external/Simple-Web-Server
   ${CMAKE_CURRENT_LIST_DIR}/external/Simple-WebSocket-Server
-  ${CMAKE_CURRENT_LIST_DIR}/external/pistache/include
+  ${OPENSSL_INCLUDE_DIR}
+#  ${CMAKE_CURRENT_LIST_DIR}/external/pistache/include
   ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
   ${OpenCV_INCLUDE_DIRS}
 )
@@ -94,6 +96,7 @@ TARGET_LINK_LIBRARIES(traffic_monitor
   ${TM_EXTERNAL_RESOURCES}
   ${CMAKE_THREAD_LIBS_INIT}
   ${Boost_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
 )
 
 ################################
