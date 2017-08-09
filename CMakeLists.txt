@@ -11,25 +11,35 @@ OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
+# For the webserver stuff. 
+set(BOOST_COMPONENTS system filesystem coroutine context thread)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+        set(BOOST_COMPONENTS ${BOOST_COMPONENTS} regex)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOOST_REGEX")
+    endif()
+endif()
+find_package(Boost 1.54.0 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
+
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_CURRENT_LIST_DIR}/external)
 
 FIND_PACKAGE(OpenCV REQUIRED)
-#FIND_PACKAGE(Qt5Widgets REQUIRED)
+find_package(Threads REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
-#  ${CMAKE_CURRENT_LIST_DIR}/include/traffic_monitor
-
+  #  External libraries. 
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
-  ${CMAKE_CURRENT_LIST_DIR}/external/argparse
+  ${CMAKE_CURRENT_LIST_DIR}/external/Simple-Web-Server
+  ${CMAKE_CURRENT_LIST_DIR}/external/Simple-WebSocket-Server
   ${CMAKE_CURRENT_LIST_DIR}/external/pistache/include
   ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
   ${OpenCV_INCLUDE_DIRS}
 )
 # TODO(gocarlos) add this as external project.
 INCLUDE("${CMAKE_CURRENT_LIST_DIR}/external/miniglog/CMakeLists.txt")
-INCLUDE("${CMAKE_CURRENT_LIST_DIR}/external/pistache/CMakeLists.txt")
 
 SET(TM_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
@@ -71,7 +81,6 @@ LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 SET(TM_EXTERNAL_RESOURCES
   ${OpenCV_LIBRARIES}
   ${MINI_GLOG}
-  pistache
 )
 
 # todo(gocarlos) add here a library
@@ -83,6 +92,8 @@ SET(TM_EXTERNAL_RESOURCES
 ADD_EXECUTABLE(traffic_monitor ${TM_LIB_RESOURCES} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(traffic_monitor
   ${TM_EXTERNAL_RESOURCES}
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
 )
 
 ################################
