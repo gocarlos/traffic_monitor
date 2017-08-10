@@ -97,84 +97,89 @@ int RunServer() {
       auto web_root_path = boost::filesystem::canonical("webserver");
       auto path = boost::filesystem::canonical(web_root_path / request->path);
       // Check if path is within web_root_path
-      if (distance(web_root_path.begin(), web_root_path.end()) >
-              distance(path.begin(), path.end()) ||
-          !equal(web_root_path.begin(), web_root_path.end(), path.begin()))
+      if ((distance(web_root_path.begin(), web_root_path.end()) >
+               distance(path.begin(), path.end()) ||
+           not equal(web_root_path.begin(), web_root_path.end(),
+                     path.begin()))) {
         throw invalid_argument("path must be within root path");
-      if (boost::filesystem::is_directory(path)) path /= "index.html";
+      }
+      if (boost::filesystem::is_directory(path)) {
+      }
+      path /= "index.html";
+    }
 
-      SimpleWeb::CaseInsensitiveMultimap header;
+    SimpleWeb::CaseInsensitiveMultimap header;
 
-//    Uncomment the following line to enable Cache-Control
-//    header.emplace("Cache-Control", "max-age=86400");
+    //    Uncomment the following line to enable Cache-Control
+    //    header.emplace("Cache-Control", "max-age=86400");
 
-      auto ifs = make_shared<ifstream>();
-      ifs->open(path.string(), ifstream::in | ios::binary | ios::ate);
+    auto ifs = make_shared<ifstream>();
+    ifs->open(path.string(), ifstream::in | ios::binary | ios::ate);
 
-      if (*ifs) {
-        auto length = ifs->tellg();
-        ifs->seekg(0, ios::beg);
+    if (*ifs) {
+      auto length = ifs->tellg();
+      ifs->seekg(0, ios::beg);
 
-        header.emplace("Content-Length", to_string(length));
-        response->write(header);
+      header.emplace("Content-Length", to_string(length));
+      response->write(header);
 
-        // Trick to define a recursive function within this scope (for example
-        // purposes)
-        class FileServer {
-         public:
-          static void read_and_send(
-              const shared_ptr<HttpServer::Response> &response,
-              const shared_ptr<ifstream> &ifs) {
-            // Read and send 128 KB at a time
-            static vector<char> buffer(
-                131072);  // Safe when server is running on one thread
-            streamsize read_length;
-            if ((read_length = ifs->read(&buffer[0], buffer.size()).gcount()) >
-                0) {
-              response->write(&buffer[0], read_length);
-              if (read_length == static_cast<streamsize>(buffer.size())) {
-                response->send(
-                    [response, ifs](const SimpleWeb::error_code &ec) {
-                      if (!ec)
-                        read_and_send(response, ifs);
-                      else
-                        cerr << "Connection interrupted" << endl;
-                    });
-              }
+      // Trick to define a recursive function within this scope (for example
+      // purposes)
+      class FileServer {
+       public:
+        static void read_and_send(
+            const shared_ptr<HttpServer::Response> &response,
+            const shared_ptr<ifstream> &ifs) {
+          // Read and send 128 KB at a time
+          static vector<char> buffer(
+              131072);  // Safe when server is running on one thread
+          streamsize read_length;
+          if ((read_length = ifs->read(&buffer[0], buffer.size()).gcount()) >
+              0) {
+            response->write(&buffer[0], read_length);
+            if (read_length == static_cast<streamsize>(buffer.size())) {
+              response->send([response, ifs](const SimpleWeb::error_code &ec) {
+                if (!ec) {
+                  read_and_send(response, ifs);
+                } else {
+                  cerr << "Connection interrupted" << endl;
+                }
+              });
             }
           }
-        };
-        FileServer::read_and_send(response, ifs);
-      } else
-        throw invalid_argument("could not read file");
-    } catch (const exception &e) {
-      response->write(SimpleWeb::StatusCode::client_error_bad_request,
-                      "Could not open path " + request->path + ": " + e.what());
-    }
-  };
+        }
+      };
+      FileServer::read_and_send(response, ifs);
+    } else
+      throw invalid_argument("could not read file");
+  } catch (const exception &e) {
+    response->write(SimpleWeb::StatusCode::client_error_bad_request,
+                    "Could not open path " + request->path + ": " + e.what());
+  }
+};
 
-  http_server.on_error = [](shared_ptr<HttpServer::Request> /*request*/,
-                            const SimpleWeb::error_code & /*ec*/) {
-    // Handle errors here
-  };
+http_server.on_error = [](shared_ptr<HttpServer::Request> /*request*/,
+                          const SimpleWeb::error_code & /*ec*/) {
+  // Handle errors here
+};
 
-  thread http_server_thread([&http_server]() {
-    // Start server
-    LOG(INFO) << "Webserver started";
-    http_server.start();
-  });
+thread http_server_thread([&http_server]() {
+  // Start server
+  LOG(INFO) << "Webserver started";
+  http_server.start();
+});
 
-  thread ws_server_thread([&ws_server]() {
-    // Start WS-server
-    LOG(INFO) << "Websocketsserver started";
-    ws_server.start();
-  });
-  // Wait for server to start so that the client can connect
-  this_thread::sleep_for(chrono::seconds(1));
+thread ws_server_thread([&ws_server]() {
+  // Start WS-server
+  LOG(INFO) << "Websocketsserver started";
+  ws_server.start();
+});
+// Wait for server to start so that the client can connect
+this_thread::sleep_for(chrono::seconds(1));
 
-  http_server_thread.join();
-  ws_server_thread.join();
-  return 0;
+http_server_thread.join();
+ws_server_thread.join();
+return 0;
 }
 
 int main(int argc, char *argv[]) {
