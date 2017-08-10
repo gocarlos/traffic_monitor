@@ -5,33 +5,38 @@ IF(NOT PROJECT_NAME)
   PROJECT(${TRAFFIC_MONITOR})
 ENDIF(NOT PROJECT_NAME)
 
-
-ADD_COMPILE_OPTIONS("-std=c++17")
+#ADD_COMPILE_OPTIONS("-std=c++17")
 OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
-
-
-# Instruct CMake to run moc automatically when needed.
-#SET(CMAKE_AUTOMOC ON)
-#SET(CMAKE_AUTOUIC ON)
-# Find includes in corresponding build directories.
-#SET(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+
+# For the webserver stuff. 
+set(BOOST_COMPONENTS system filesystem coroutine context thread)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+        set(BOOST_COMPONENTS ${BOOST_COMPONENTS} regex)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_BOOST_REGEX")
+    endif()
+endif()
+find_package(Boost 1.54.0 COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_CURRENT_LIST_DIR}/external)
 
 FIND_PACKAGE(OpenCV REQUIRED)
-#FIND_PACKAGE(Qt5Widgets REQUIRED)
+find_package(Threads REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
-#  ${CMAKE_CURRENT_LIST_DIR}/include/traffic_monitor
-
+  #  External libraries. 
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
-  ${CMAKE_CURRENT_LIST_DIR}/external/argparse
+  ${CMAKE_CURRENT_LIST_DIR}/external/Simple-Web-Server
+  ${CMAKE_CURRENT_LIST_DIR}/external/Simple-WebSocket-Server
+  ${OPENSSL_INCLUDE_DIR}
+#  ${CMAKE_CURRENT_LIST_DIR}/external/pistache/include
   ${CMAKE_CURRENT_LIST_DIR}/external/cxxopts/include
   ${OpenCV_INCLUDE_DIRS}
 )
@@ -43,17 +48,17 @@ SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 
 
 IF(DO_COVERAGE_TEST)
-  MESSAGE("\nGoing to build the coverage tests.\n\n\n")
+  MESSAGE(WARNING "\nGoing to build the coverage tests.\n\n\n")
   INCLUDE(CodeCoverage)
   SETUP_TARGET_FOR_COVERAGE(${PROJECT_NAME}_coverage tests coverage)
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
 ELSE()
-  MESSAGE("\nNot building the coverage tests. \n\n\n")
+  MESSAGE(WARNING "\nNot building the coverage tests. \n\n\n")
 
   # Optimize the code with the compiler if the target device has a x86 processor and not doing code coverage tests.
   IF(CMAKE_SYSTEM_PROCESSOR MATCHES "amd64.*|x86_64.*|AMD64.*|i686.*|i386.*|x86.*")
-    MESSAGE("Current System is x86.")
+    MESSAGE(WARNING "Current System is x86.")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
   ENDIF()
@@ -75,12 +80,9 @@ FILE(GLOB_RECURSE TM_LIB_SOURCES "${TM_LIB_SRC_DIR}/*.cc")
 SET(TM_LIB_RESOURCES ${TM_LIB_SOURCES} ${TM_LIB_HEADERS})
 LIST(REMOVE_ITEM TM_LIB_RESOURCES "${TM_LIB_SRC_DIR}/main.cc")
 
-
 SET(TM_EXTERNAL_RESOURCES
   ${OpenCV_LIBRARIES}
   ${MINI_GLOG}
-#  Qt5::Widgets
-#  Qt5::Core
 )
 
 # todo(gocarlos) add here a library
@@ -92,6 +94,9 @@ SET(TM_EXTERNAL_RESOURCES
 ADD_EXECUTABLE(traffic_monitor ${TM_LIB_RESOURCES} "${TM_LIB_SRC_DIR}/main.cc")
 TARGET_LINK_LIBRARIES(traffic_monitor
   ${TM_EXTERNAL_RESOURCES}
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
 )
 
 ################################

@@ -1,0 +1,9 @@
+[submodule "external/pistache"]
+	path = external/pistache
+	url = https://github.com/vigilatore/pistache.git
+[submodule "external/Simple-Web-Server"]
+	path = external/Simple-Web-Server
+	url = https://github.com/vigilatore/Simple-Web-Server.git
+[submodule "external/Simple-WebSocket-Server"]
+	path = external/Simple-WebSocket-Server
+	url = https://github.com/vigilatore/Simple-WebSocket-Server.git
