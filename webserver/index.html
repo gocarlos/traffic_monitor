@@ -2,18 +2,18 @@
 <meta charset="utf-8" />
 <title>Traffic Monitor</title>
 <script language="javascript" type="text/javascript">
-  // var wsUri = "ws://echo.websocket.org/";
   var wsUri = "ws://localhost:8090/echo";
 
   var output;
 
   function init() {
     output = document.getElementById("output");
-    testWebSocket();
+    InitWebSocket();
   }
 
-  function testWebSocket() {
+  function InitWebSocket() {
     websocket = new WebSocket(wsUri);
+    
     websocket.onopen = function(evt) {
       onOpen(evt)
     };
@@ -59,7 +59,7 @@
   }
 
   function sendAndReceive() {
-    testWebSocket();
+	  InitWebSocket();
   }
 
   window.addEventListener("load", init, false);

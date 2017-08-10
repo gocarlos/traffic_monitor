@@ -73,7 +73,11 @@ void Tracker::RunTracker() {
 
   LOG(INFO) << "Entering the main loop.";
 
-  while (vid_capture_.isOpened() && chCheckForEscKey != 27) {
+  // As long as the camera is streaming aka video not finished,
+  // the ESC key is not pressed in the GUI,
+  // and no signal is received.
+  while (vid_capture_.isOpened() && chCheckForEscKey != 27 &&
+         (not Settings::stop_)) {
     std::vector<Blob> current_frame_blobs;
 
     cv::Mat imgFrame1Copy = img_frame_1_.clone();
@@ -219,7 +223,7 @@ void Tracker::RunTracker() {
   //    // hold the windows open to allow the "end of video" message to show.
   //    cv::waitKey(0);
   //  }
-//  return 0;
+  //  return 0;
 }
 
 } /* namespace traffic_monitor */

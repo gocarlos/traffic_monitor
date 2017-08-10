@@ -14,4 +14,9 @@ bool Settings::debug_mode_ = false;
 
 int Settings::frame_scale_ = 1;
 
-} /* namespace traffic_monitor */
+int Settings::ws_server_port_ = 8090;
+int Settings::http_server_port_ = 8080;
+
+bool Settings::stop_ = false;
+
+}  // namespace traffic_monitor

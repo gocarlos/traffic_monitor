@@ -22,6 +22,9 @@
 #include "crypto.hpp"
 #endif
 
+
+#include "traffic_monitor/settings.h"
+
 namespace traffic_monitor {
 
 using namespace boost::property_tree;
@@ -40,6 +43,7 @@ class Server {
   std::thread ws_server_thread;
   int RunServer();
   int Close();
+  void PrintHelp();
 
   Server();
   virtual ~Server();

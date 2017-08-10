@@ -1,6 +1,7 @@
 // (c) 2017 Vigilatore
 
 #include <algorithm>
+#include <csignal>
 #include <fstream>
 #include <vector>
 
@@ -12,8 +13,17 @@
 
 using namespace traffic_monitor;
 
+Server server;
+
+void inthand(int signum) {
+  LOG(WARNING) << "Interrupt signal (" << signum << ") received.";
+  Settings::stop_ = true;
+  server.Close();
+}
+
 int main(int argc, char *argv[]) {
   //  google::InitGoogleLogging(argv[0]); does nothing, as we use miniglog
+  signal(SIGINT, inthand);
 
   cxxopts::Options options("Traffic Monitor", "todo: longer app description");
 
@@ -31,21 +41,23 @@ int main(int argc, char *argv[]) {
   if (log_file.size() > 0) {
     Settings::path_to_log_file_ = log_file;
   }
+
   LOG_IF(INFO, not Settings::with_gui_)
       << "Starting traffic monitor without GUI";
   LOG_IF(INFO, Settings::debug_mode_)
       << "Starting traffic monitor in debug mode";
   LOG(INFO) << "Path to logging file is: " << Settings::path_to_log_file_;
 
+  // Start the car tracker.
   Tracker tracker(Tracker::camera, "0");
   std::thread tracker_thread(&Tracker::RunTracker, &tracker);
 
-  Server server;
+  // Start the web server.
   server.RunServer();
 
-  server.Close();
+  // Close the web server.
   tracker_thread.join();
 
-  LOG(INFO) << "Closing traffic monitor.";
+  LOG(WARNING) << "Closing traffic monitor.";
   return 0;
 }

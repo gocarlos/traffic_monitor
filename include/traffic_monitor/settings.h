@@ -27,11 +27,15 @@ class Settings {
   static std::string path_to_log_file_;
   static bool with_gui_;
   static bool debug_mode_;
+  static bool stop_;
+
+  static int ws_server_port_;
+  static int http_server_port_;
 
   // Divide frame dimensions by this number.
   static int frame_scale_;
 };
 
-} /* namespace traffic_monitor */
+}  // namespace traffic_monitor
 
-#endif /* INCLUDE_TRAFFIC_MONITOR_SETTINGS_H_ */
+#endif  // INCLUDE_TRAFFIC_MONITOR_SETTINGS_H_

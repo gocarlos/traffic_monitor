@@ -14,22 +14,40 @@ Server::Server() {
 
   ws_server = new WsServer;
   http_server = new HttpServer;
+  ws_server->config.port = Settings::ws_server_port_;
+  http_server->config.port = Settings::http_server_port_;
 }
 
 int Server::Close() {
-  //  http_server_thread.join();
-  //  ws_server_thread.join();
+  LOG(INFO) << "Going to closing the server.";
+
+  ws_server->stop();
+  http_server->stop();
+
   http_server_thread.join();
   ws_server_thread.join();
 
-  LOG(WARNING) << "Closing the server.";
+  delete ws_server, http_server;
+
+  LOG(INFO) << "Closing the server.";
   return 0;
 }
 
-Server::~Server() { LOG(WARNING) << "Destructing the server."; }
+Server::~Server() {
+  ws_server = nullptr;
+  http_server = nullptr;
+
+  LOG(INFO) << "Destructing the server.";
+}
+
+void Server::PrintHelp() {
+  // clang-format off
+  std::cout << "The activity on the street is streamed to the page: http://localhost:8080." << std::endl;
+  std::cout << "You can view statistics and adjust some settings. "<< std::endl;
+  // clang-format on
+}
 
 int Server::RunServer() {
-  ws_server->config.port = 8090;
   auto &echo = ws_server->endpoint["^/echo/?$"];
 
   echo.on_message = [](shared_ptr<WsServer::Connection> connection,
@@ -71,17 +89,14 @@ int Server::RunServer() {
               << " with status code " << status << std::endl;
   };
 
-// See
-//
-http:  // www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
+  // See
+  // http:// www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
   // Error Codes for error code meanings
   echo.on_error = [](shared_ptr<WsServer::Connection> connection,
                      const SimpleWeb::error_code &ec) {
     cout << "Server: Error in connection " << connection.get() << ". "
          << "Error: " << ec << ", error message: " << ec.message() << endl;
   };
-
-  http_server->config.port = 8080;
 
   http_server->default_resource["GET"] = [](
       std::shared_ptr<HttpServer::Response> response,
@@ -152,6 +167,7 @@ http:  // www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
 
   http_server->on_error = [](shared_ptr<HttpServer::Request> /*request*/,
                              const SimpleWeb::error_code & /*ec*/) {
+    //	  LOG(ERROR)<< "Errors occurred: "<<
     // Handle errors here
   };
 
@@ -170,29 +186,6 @@ http:  // www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
   // Wait for server to start so that the client can connect
   this_thread::sleep_for(chrono::seconds(1));
 
-  //  thread http_server_thread([&http_server]() {
-  //    // Start server
-  //    LOG(INFO) << "Webserver started";
-  //    http_server.start();
-  //  });
-  //
-  //  thread ws_server_thread([&ws_server]() {
-  //    // Start WS-server
-  //    LOG(INFO) << "Websocketsserver started";
-  //    ws_server.start();
-  //  });
-  //
-  //  // Wait for server to start so that the client can connect
-  //  this_thread::sleep_for(chrono::seconds(1));
-  //
-  //  while (true) {
-  //    LOG(INFO) << "asdfasf";
-  //    sleep(3);
-  //  };
-  //
-  //
-  //  http_server_thread.join();
-  //  ws_server_thread.join();
   LOG(INFO) << "Server ready";
   return 0;
 }
