@@ -10,15 +10,21 @@
     output = document.getElementById("output");
     InitWebSocket();
   }
+  var mainloop = function() {
+      updateGame();
+      drawGame();
+  };
 
   function InitWebSocket() {
     websocket = new WebSocket(wsUri);
-    
+
     websocket.onopen = function(evt) {
       onOpen(evt)
     };
     websocket.onclose = function(evt) {
-      onClose(evt)
+      console.log('onclose called');
+
+      // onClose(evt)
     };
     websocket.onmessage = function(evt) {
       onMessage(evt)
@@ -63,6 +69,9 @@
   }
 
   window.addEventListener("load", init, false);
+  while ( true ) {
+      mainloop();
+  }
 </script>
 
 <h2>WebSocket Test</h2>

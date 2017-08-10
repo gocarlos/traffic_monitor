@@ -174,8 +174,8 @@ void Tracker::RunTracker() {
     }
     int at_least_one_blob_crossed_line =
         traffic_monitor::Tools::CheckIfBlobsCrossedTheLine(
-            blobs_, vertical_line_position_, car_count_left_, car_count_right_,
-            log_file_);
+            blobs_, vertical_line_position_, Statistics::car_count_left_,
+            Statistics::car_count_right_, log_file_);
 
     if (at_least_one_blob_crossed_line == 1) {
       cv::line(imgFrame2Copy, crossing_line_[0], crossing_line_[1],
@@ -189,8 +189,8 @@ void Tracker::RunTracker() {
     }
 
     if (Settings::with_gui_) {
-      Drawer::DrawCarCountOnImage(car_count_left_, car_count_right_,
-                                  imgFrame2Copy);
+      Drawer::DrawCarCountOnImage(Statistics::car_count_left_,
+                                  Statistics::car_count_right_, imgFrame2Copy);
 
       cv::imshow("imgFrame2Copy", imgFrame2Copy);
     }

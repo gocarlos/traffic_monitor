@@ -55,6 +55,11 @@ int main(int argc, char *argv[]) {
   // Start the web server.
   server.RunServer();
 
+  while (true) {
+    sleep(2);
+    server.SendMessage();
+  };
+
   // Close the web server.
   tracker_thread.join();
 

@@ -16,6 +16,7 @@
 #include "traffic_monitor/blob.h"
 #include "traffic_monitor/drawer.h"
 #include "traffic_monitor/settings.h"
+#include "traffic_monitor/statistics.h"
 #include "traffic_monitor/tools.h"
 
 namespace traffic_monitor {
@@ -34,8 +35,7 @@ class Tracker {
 
   cv::Point crossing_line_[2];
 
-  int car_count_left_{0};
-  int car_count_right_{0};
+
   bool first_frame_ = false;
 
   int frame_count_{0};

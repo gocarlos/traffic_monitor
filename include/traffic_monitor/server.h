@@ -22,8 +22,8 @@
 #include "crypto.hpp"
 #endif
 
-
 #include "traffic_monitor/settings.h"
+#include "traffic_monitor/statistics.h"
 
 namespace traffic_monitor {
 
@@ -36,6 +36,7 @@ using namespace std;
 
 class Server {
  public:
+  int asdfasf;
   WsServer *ws_server;
   HttpServer *http_server;
 
@@ -44,9 +45,14 @@ class Server {
   int RunServer();
   int Close();
   void PrintHelp();
+  void SendMessage();
 
   Server();
   virtual ~Server();
+
+ private:
+  void RunHttpServer();
+  void RunWsServer();
 };
 
 }  // namespace traffic_monitor

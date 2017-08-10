@@ -48,13 +48,13 @@ SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 
 
 IF(DO_COVERAGE_TEST)
-  MESSAGE(WARNING "\nGoing to build the coverage tests.\n\n\n")
+  MESSAGE(WARNING "\nGoing to build the coverage tests.\n")
   INCLUDE(CodeCoverage)
   SETUP_TARGET_FOR_COVERAGE(${PROJECT_NAME}_coverage tests coverage)
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -fprofile-arcs -ftest-coverage")
 ELSE()
-  MESSAGE(WARNING "\nNot building the coverage tests. \n\n\n")
+  MESSAGE(WARNING "\nNot building the coverage tests. \n")
 
   # Optimize the code with the compiler if the target device has a x86 processor and not doing code coverage tests.
   IF(CMAKE_SYSTEM_PROCESSOR MATCHES "amd64.*|x86_64.*|AMD64.*|i686.*|i386.*|x86.*")
