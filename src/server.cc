@@ -53,6 +53,17 @@ void Server::SendMessage() {
 
   auto send_stream = std::make_shared<WsServer::SendStream>();
   *send_stream << "asdfasf: " << asdfasf++;
+  //  int con_size = ws_server->get_connections().size();
+  //  std::cout << "size(): " << con_size << std::endl;
+  //  if (con_size) {
+  //    std::cout << "sending" << std::endl;
+  //    (*(ws_server->get_connections().begin()))->send(send_stream);
+  //  } else {
+  //    std::cout << "not sending anything" << std::endl;
+  //    auto &echo2 = ws_server->endpoint["^/echo/?$"];
+  //    std::cout << "asasddasdasdasdasdasdadssd: "
+  //              << echo2.get_connections().size() << std::endl;
+  //  }
 }
 
 void Server::RunHttpServer() {
@@ -139,8 +150,11 @@ void Server::RunHttpServer() {
 void Server::RunWsServer() {
   auto &echo = ws_server->endpoint["^/echo/?$"];
 
-  echo.on_message = [](std::shared_ptr<WsServer::Connection> connection,
-                       std::shared_ptr<WsServer::Message> message) {
+  echo.on_message = [&](std::shared_ptr<WsServer::Connection> connection,
+                        std::shared_ptr<WsServer::Message> message) {
+
+    std::cout << "12341234123412341234: " << echo.get_connections().size()
+              << std::endl;
 
     std::string car_left = std::to_string(Statistics::car_count_left_);
     std::string car_right = std::to_string(Statistics::car_count_right_);
@@ -151,10 +165,10 @@ void Server::RunWsServer() {
         " passing to the right. ";
 
     LOG(INFO) << "Server: Message received: \"" << message_str << "\" from"
-              << connection.get();
+              << connection;
 
     LOG(INFO) << "Server: Sending message \"" << message_str << "\" to "
-              << connection.get();
+              << connection;
 
     auto send_stream = make_shared<WsServer::SendStream>();
     *send_stream << message_str;
@@ -175,7 +189,8 @@ void Server::RunWsServer() {
   };
 
   echo.on_open = [&](shared_ptr<WsServer::Connection> connection) {
-    std::cout << "Server: Opened connection " << connection.get() << endl;
+    std::cout << "Server: Opened connection " << connection << endl;
+
   };
 
   // See RFC 6455 7.4.1. for status codes
@@ -198,6 +213,7 @@ void Server::RunWsServer() {
     // Start WS-server
     LOG(INFO) << "Websockets server started";
     ws_server->start();
+    ws_server_started = true;
   });
 }
 

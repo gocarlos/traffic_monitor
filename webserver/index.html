@@ -5,55 +5,51 @@
   var wsUri = "ws://localhost:8090/echo";
 
   var output;
+  var recv_msg;
+  var status_msg;
+  var qwer = 0;
 
   function init() {
     output = document.getElementById("output");
     InitWebSocket();
   }
-  var mainloop = function() {
-      updateGame();
-      drawGame();
-  };
 
   function InitWebSocket() {
     websocket = new WebSocket(wsUri);
 
     websocket.onopen = function(evt) {
+      console.log('onOpen called');
       onOpen(evt)
     };
     websocket.onclose = function(evt) {
-      console.log('onclose called');
-
+      console.log('onClose called');
       // onClose(evt)
+      status_msg = "DISCONNECTED";
+
     };
     websocket.onmessage = function(evt) {
-      onMessage(evt)
+      console.log('onMessage called');
+      recv_msg = evt.data;
+      websocket.close();
+      // onMessage(evt)
     };
     websocket.onerror = function(evt) {
-      onError(evt)
+      console.log('onError called');
+      writeToScreen('<span style="color: red;">ERROR:</span> ' + 'Connection closed');
+      clearInterval(refreshIntervalId);
+
     };
   }
 
   function onOpen(evt) {
-    writeToScreen("CONNECTED");
-    doSend("WebSocket rocks");
+    status_msg = "CONNECTED";
+    // writeToScreen("CONNECTED");
+    doSend("yo");
   }
 
-  function onClose(evt) {
-    writeToScreen("DISCONNECTED");
-  }
-
-  function onMessage(evt) {
-    writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
-    websocket.close();
-  }
-
-  function onError(evt) {
-    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
-  }
 
   function doSend(message) {
-    writeToScreen("SENT: " + message);
+    // writeToScreen("SENT: " + message);
     websocket.send(message);
   }
 
@@ -65,17 +61,27 @@
   }
 
   function sendAndReceive() {
-	  InitWebSocket();
+    InitWebSocket();
+  }
+
+  function onTimerTick() {
+    sendAndReceive();
+    qwer = qwer + 1;
+    document.getElementById('tata0').innerHTML = qwer;
+    // document.getElementById('tata1').innerHTML = status_msg;
+    document.getElementById('tata2').innerHTML = recv_msg;
+
   }
 
   window.addEventListener("load", init, false);
-  while ( true ) {
-      mainloop();
-  }
+  var refreshIntervalId = setInterval(onTimerTick, 1000);
 </script>
 
-<h2>WebSocket Test</h2>
+<h2>Traffic Monitor</h2>
 
-<button type="submit" onclick="javascript:sendAndReceive()">call</button>
+<!-- <button type="submit" onclick="javascript:sendAndReceive()">call</button> -->
 
 <div id="output"></div>
+<p id="tata0"></p>
+<p id="tata1"></p>
+<p id="tata2"></p>

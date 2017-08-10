@@ -42,6 +42,8 @@ class Server {
 
   std::thread http_server_thread;
   std::thread ws_server_thread;
+  bool ws_server_started=false;
+
   int RunServer();
   int Close();
   void PrintHelp();
