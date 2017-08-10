@@ -47,8 +47,8 @@ class Tracker {
   int camera_number_;
   std::string video_path_;
 
-  Tracker();
-  int run();
+  Tracker(Tracker::Input input, std::string stream);
+  void RunTracker();
 };
 
 }  // namespace traffic_monitor

@@ -9,22 +9,38 @@
 
 namespace traffic_monitor {
 
+Server::Server() {
+  // TODO Auto-generated constructor stub
+
+  ws_server = new WsServer;
+  http_server = new HttpServer;
+}
+
+int Server::Close() {
+  //  http_server_thread.join();
+  //  ws_server_thread.join();
+  http_server_thread.join();
+  ws_server_thread.join();
+
+  LOG(WARNING) << "Closing the server.";
+  return 0;
+}
+
+Server::~Server() { LOG(WARNING) << "Destructing the server."; }
 
 int Server::RunServer() {
-  //  LOG(INFO) << "Starting the Websocket Server.";
-  WsServer ws_server;
-  ws_server.config.port = 8090;
-  auto &echo = ws_server.endpoint["^/echo/?$"];
+  ws_server->config.port = 8090;
+  auto &echo = ws_server->endpoint["^/echo/?$"];
 
   echo.on_message = [](shared_ptr<WsServer::Connection> connection,
                        shared_ptr<WsServer::Message> message) {
     auto message_str = message->string();
 
-    std::cout << "Server: Message received: \"" << message_str << "\" from "
-              << connection.get() << endl;
+    LOG(INFO) << "Server: Message received: \"" << message_str << "\" from "
+              << connection.get();
 
-    std::cout << "Server: Sending message \"" << message_str << "\" to "
-              << connection.get() << endl;
+    LOG(INFO) << "Server: Sending message \"" << message_str << "\" to "
+              << connection.get();
 
     auto send_stream = make_shared<WsServer::SendStream>();
     *send_stream << message_str;
@@ -33,7 +49,7 @@ int Server::RunServer() {
       if (ec) {
         std::cout << "Server: Error sending message. " <<
             // See
-            // http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
+            //              http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
             // Error Codes for error code meanings
             "Error: " << ec << ", error message: " << ec.message() << endl;
       }
@@ -55,8 +71,9 @@ int Server::RunServer() {
               << " with status code " << status << std::endl;
   };
 
-  // See
-  // http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
+// See
+//
+http:  // www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html,
   // Error Codes for error code meanings
   echo.on_error = [](shared_ptr<WsServer::Connection> connection,
                      const SimpleWeb::error_code &ec) {
@@ -64,11 +81,9 @@ int Server::RunServer() {
          << "Error: " << ec << ", error message: " << ec.message() << endl;
   };
 
-  //  LOG(INFO) << "Starting the HTTP Server.";
-  HttpServer http_server;
-  http_server.config.port = 8080;
+  http_server->config.port = 8080;
 
-  http_server.default_resource["GET"] = [](
+  http_server->default_resource["GET"] = [](
       std::shared_ptr<HttpServer::Response> response,
       shared_ptr<HttpServer::Request> request) {
     try {
@@ -135,27 +150,50 @@ int Server::RunServer() {
     }
   };
 
-  http_server.on_error = [](shared_ptr<HttpServer::Request> /*request*/,
-                            const SimpleWeb::error_code & /*ec*/) {
+  http_server->on_error = [](shared_ptr<HttpServer::Request> /*request*/,
+                             const SimpleWeb::error_code & /*ec*/) {
     // Handle errors here
   };
 
-  thread http_server_thread([&http_server]() {
+  http_server_thread = std::thread([&]() {
     // Start server
     LOG(INFO) << "Webserver started";
-    http_server.start();
+    http_server->start();
   });
 
-  thread ws_server_thread([&ws_server]() {
+  ws_server_thread = std::thread([&]() {
     // Start WS-server
     LOG(INFO) << "Websocketsserver started";
-    ws_server.start();
+    ws_server->start();
   });
+
   // Wait for server to start so that the client can connect
   this_thread::sleep_for(chrono::seconds(1));
 
-  http_server_thread.join();
-  ws_server_thread.join();
+  //  thread http_server_thread([&http_server]() {
+  //    // Start server
+  //    LOG(INFO) << "Webserver started";
+  //    http_server.start();
+  //  });
+  //
+  //  thread ws_server_thread([&ws_server]() {
+  //    // Start WS-server
+  //    LOG(INFO) << "Websocketsserver started";
+  //    ws_server.start();
+  //  });
+  //
+  //  // Wait for server to start so that the client can connect
+  //  this_thread::sleep_for(chrono::seconds(1));
+  //
+  //  while (true) {
+  //    LOG(INFO) << "asdfasf";
+  //    sleep(3);
+  //  };
+  //
+  //
+  //  http_server_thread.join();
+  //  ws_server_thread.join();
+  LOG(INFO) << "Server ready";
   return 0;
 }
 

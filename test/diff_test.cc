@@ -12,19 +12,19 @@
 namespace traffic_monitor {
 
 TEST(IntegrationTests, tes_with_video_data) {
-  Tracker tracker;
-  std::string path_to_file_ = "movie.mp4";
-
-  std::ifstream f(path_to_file_.c_str());
+  std::string stream = "movie.mp4";
+  // Check if the file exists.
+  std::ifstream f(stream.c_str());
   CHECK(f.good());
 
-  tracker.input_ = Tracker::file;
-  tracker.video_path_ = path_to_file_;
+  Tracker tracker(Tracker::file, stream);
+
   // Travis supports testing of gui apps :
   // http://craigthomas.ca/blog/2014/05/26/travis-ci-and-gui-testing/
   Settings::with_gui_ = true;
 
-  tracker.run();
+  tracker.RunTracker();
+
   double maximal_distance = 0.1;
   EXPECT_LE(0.1, maximal_distance);
 }

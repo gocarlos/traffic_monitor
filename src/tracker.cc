@@ -4,23 +4,31 @@
 
 namespace traffic_monitor {
 
-Tracker::Tracker() : camera_number_(0), video_path_{""}, input_(camera){
+Tracker::Tracker(Tracker::Input input, std::string stream) : input_(input) {
   LOG(INFO) << "Setting up the tracker.";
 
-  std::size_t num_cameras{0};
-  for (std::size_t i = 0; i < 5; ++i) {
-    vid_capture_.open(i);
-    if (not vid_capture_.isOpened()) {
-      ++num_cameras;
-    }
-  }
-  if (num_cameras > 0) {
-    LOG(INFO) << "There are " << num_cameras
-              << " available. \nTaking the first one";
+  if (input_ == Tracker::camera) {
+    LOG(INFO) << "Stream is set to camera.";
+    camera_number_ = std::stoi(stream);
+
+    //    std::size_t num_cameras{0};
+    //    for (std::size_t i = 0; i < 5; ++i) {
+    //      vid_capture_.open(i);
+    //      if (not vid_capture_.isOpened()) {
+    //        ++num_cameras;
+    //      }
+    //    }
+    //    if (num_cameras > 0) {
+    //      LOG(INFO) << "There are " << num_cameras
+    //                << " available. \nTaking the first one";
+    //    }
+  } else {
+    LOG(INFO) << "Stream is set to file.";
+    video_path_ = stream;
   }
 }
 
-int Tracker::run() {
+void Tracker::RunTracker() {
   // TODO(gocarlos) choose the camera or video here.
 
   if (input_ == camera) {
@@ -32,9 +40,12 @@ int Tracker::run() {
   }
 
   // todo log to good directory
-  log_file_.open("../logging/OpenCV-" + std::to_string(time(0)) + ".txt");
-  std::cout << "Logging to: \"/tmp/OpenCV-"
-            << "-" << std::to_string(time(0)) << ".txt\"" << std::endl;
+  std::string log_file_name = Settings::path_to_log_file_ +
+                              "traffic_monitor_log_" + std::to_string(time(0)) +
+                              ".txt";
+
+  log_file_.open(log_file_name);
+  LOG(INFO) << "Logging to file: " << log_file_name;
 
   log_file_ << "\"Timestamp\",\"Left\",\"Right\"" << std::endl;
 
@@ -208,7 +219,7 @@ int Tracker::run() {
   //    // hold the windows open to allow the "end of video" message to show.
   //    cv::waitKey(0);
   //  }
-  return 0;
+//  return 0;
 }
 
 } /* namespace traffic_monitor */

@@ -37,13 +37,15 @@ int main(int argc, char *argv[]) {
       << "Starting traffic monitor in debug mode";
   LOG(INFO) << "Path to logging file is: " << Settings::path_to_log_file_;
 
-  Server::RunServer();
+  Tracker tracker(Tracker::camera, "0");
+  std::thread tracker_thread(&Tracker::RunTracker, &tracker);
 
-  Tracker tracker;
+  Server server;
+  server.RunServer();
 
-  tracker.input_ = Tracker::camera;
-  tracker.camera_number_ = 0;
-  tracker.run();
+  server.Close();
+  tracker_thread.join();
 
+  LOG(INFO) << "Closing traffic monitor.";
   return 0;
 }
