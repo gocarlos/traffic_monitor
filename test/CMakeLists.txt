@@ -29,12 +29,16 @@ ADD_EXECUTABLE(${TM_TESTS}
   ${TM_TESTS_HEADERS}
   ${TM_TESTS_SOURCES}
   ${TM_LIB_RESOURCES}
+  
 )
 
 # Link test executable against gtest & gtest_main
 TARGET_LINK_LIBRARIES(${TM_TESTS}
   gtest gtest_main
   ${TM_EXTERNAL_RESOURCES}
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${Boost_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
 )
 
 ADD_TEST(${TM_TESTS} ${TM_TESTS})
