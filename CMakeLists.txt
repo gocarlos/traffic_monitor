@@ -11,7 +11,7 @@ OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 
-# For the webserver stuff. 
+# For the webserver stuff.
 set(BOOST_COMPONENTS system filesystem coroutine context thread)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
@@ -31,7 +31,7 @@ find_package(OpenSSL REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}/include
-  #  External libraries. 
+  #  External libraries.
   ${CMAKE_CURRENT_LIST_DIR}/external/miniglog
   ${CMAKE_CURRENT_LIST_DIR}/external/Simple-Web-Server
   ${CMAKE_CURRENT_LIST_DIR}/external/Simple-WebSocket-Server
@@ -118,3 +118,4 @@ INSTALL(
 )
 
 INSTALL(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/settings DESTINATION traffic_monitor)
+INSTALL(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/webserver DESTINATION traffic_monitor)
