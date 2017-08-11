@@ -23,6 +23,7 @@
 #endif
 
 #include "traffic_monitor/settings.h"
+#include "traffic_monitor/paths.h"
 #include "traffic_monitor/statistics.h"
 
 namespace traffic_monitor {
@@ -39,6 +40,8 @@ class Server {
   int asdfasf;
   WsServer *ws_server;
   HttpServer *http_server;
+  
+  std::string web_root_path_;
 
   std::thread http_server_thread;
   std::thread ws_server_thread;

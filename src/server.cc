@@ -1,9 +1,4 @@
-/*
- * server.cc
- *
- *  Created on: Aug 10, 2017
- *      Author: gocarlos
- */
+// (c) 2017 Vigilatore
 
 #include <traffic_monitor/server.h>
 
@@ -16,6 +11,9 @@ Server::Server() {
   http_server = new HttpServer;
   ws_server->config.port = Settings::ws_server_port_;
   http_server->config.port = Settings::http_server_port_;
+
+  web_root_path_= prefix_to_webserver;
+
 }
 
 int Server::Close() {
@@ -50,20 +48,6 @@ void Server::PrintHelp() {
 void Server::SendMessage() {
   LOG(INFO) << "Connection size:" << ws_server->get_connections().size();
   LOG(INFO) << "Connection size:" << asdfasf;
-
-  auto send_stream = std::make_shared<WsServer::SendStream>();
-  *send_stream << "asdfasf: " << asdfasf++;
-  //  int con_size = ws_server->get_connections().size();
-  //  std::cout << "size(): " << con_size << std::endl;
-  //  if (con_size) {
-  //    std::cout << "sending" << std::endl;
-  //    (*(ws_server->get_connections().begin()))->send(send_stream);
-  //  } else {
-  //    std::cout << "not sending anything" << std::endl;
-  //    auto &echo2 = ws_server->endpoint["^/echo/?$"];
-  //    std::cout << "asasddasdasdasdasdasdadssd: "
-  //              << echo2.get_connections().size() << std::endl;
-  //  }
 }
 
 void Server::RunHttpServer() {
@@ -71,7 +55,7 @@ void Server::RunHttpServer() {
       std::shared_ptr<HttpServer::Response> response,
       shared_ptr<HttpServer::Request> request) {
     try {
-      auto web_root_path = boost::filesystem::canonical("webserver");
+      auto web_root_path = boost::filesystem::canonical(web_root_path_);
       auto path = boost::filesystem::canonical(web_root_path / request->path);
       // Check if path is within web_root_path
       if (distance(web_root_path.begin(), web_root_path.end()) >
@@ -85,9 +69,6 @@ void Server::RunHttpServer() {
       }
 
       SimpleWeb::CaseInsensitiveMultimap header;
-
-      //    Uncomment the following line to enable Cache-Control
-      //    header.emplace("Cache-Control", "max-age=86400");
 
       auto ifs = make_shared<ifstream>();
       ifs->open(path.string(), ifstream::in | ios::binary | ios::ate);

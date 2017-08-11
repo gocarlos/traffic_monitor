@@ -7,6 +7,7 @@ ENDIF(NOT PROJECT_NAME)
 
 #ADD_COMPILE_OPTIONS("-std=c++17")
 OPTION(DO_COVERAGE_TEST "Test the coverage of the unit tests using CodeCov" OFF)
+OPTION(CREATE_SNAP_APP "Create a snap package for linux with snapcraft." OFF)
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -w")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
@@ -46,6 +47,9 @@ INCLUDE("${CMAKE_CURRENT_LIST_DIR}/external/miniglog/CMakeLists.txt")
 SET(TM_LIB_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 SET(TM_LIB_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 
+# set the path to the needed files in a header file.
+# needed as the snap app sees the file system in new way.
+INCLUDE(Settings)
 
 IF(DO_COVERAGE_TEST)
   MESSAGE(WARNING "\nGoing to build the coverage tests.\n")

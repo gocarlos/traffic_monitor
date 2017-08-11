@@ -1,24 +1,27 @@
-name:                   traffic-monitor
-version:                '0.0.1'
-summary:                Traffic Monitor app. Lets you count cars passing on the street.
-description:            |
+name:               traffic-monitor
+version:            '0.0.1'
+summary:            Traffic Monitor app. Lets you count cars passing on the street.
+description:        |
   App to count how many cars drive on a certain street. This is accomplished with computer vision, by filming the street with a camera. This program also collects statistics which can be seen afterwards.
-grade:                  stable
-confinement:            devmode
-icon:                   snap/gui/icon.png
-type:                   app
+grade:              stable
+confinement:        devmode
+icon:               snap/gui/icon.png
+type:               app
 apps:
   traffic-monitor:
-    command:            desktop-launch ${SNAP}/bin/traffic_monitor
-    plugs:              [home, unity7, x11, camera,network-bind, network-control, account-control]
+    command:        desktop-launch ${SNAP}/bin/traffic_monitor
+    plugs:          [home, unity7, x11, camera,network-bind, network-control, account-control]
 
-# TODO(gocarlos): check if all those dependencies are needed.
+# TODO(gocarlos):   check if all those dependencies are needed.
+# TODO(gocarlos):   Remove the qt stuff. 
 parts:
   traffic-monitor:
-    source-type:        git
-    plugin:             cmake
+    source-type:    git
+    plugin:         cmake
+    configflags:
+      - -DCREATE_SNAP_APP=ON
     # A list of Ubuntu packages to be installed on the host to aid in building the part. These packages will not go into the final snap.
-    after:              [desktop-qt5]
+    after:          [desktop-qt5]
     build-packages:
       - build-essential
       - qt5-default
