@@ -51,7 +51,7 @@ void Server::SendMessage() {
 }
 
 void Server::RunHttpServer() {
-  http_server->default_resource["GET"] = [](
+  http_server->default_resource["GET"] = [&](
       std::shared_ptr<HttpServer::Response> response,
       shared_ptr<HttpServer::Request> request) {
     try {
