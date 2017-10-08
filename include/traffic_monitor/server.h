@@ -8,9 +8,6 @@
 
 #include <glog/logging.h>
 
-#include "client_ws.hpp"
-#include "server_ws.hpp"
-
 #include "client_http.hpp"
 #include "server_http.hpp"
 #define BOOST_SPIRIT_THREADSAFE
@@ -31,33 +28,28 @@ namespace traffic_monitor {
 using namespace boost::property_tree;
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
 // typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
-typedef SimpleWeb::SocketServer<SimpleWeb::WS> WsServer;
+// typedef SimpleWeb::SocketServer<SimpleWeb::WS> WsServer;
 // typedef SimpleWeb::SocketClient<SimpleWeb::WS> WsClient;
 using namespace std;
 
 class Server {
  public:
-  int asdfasf;
-  WsServer *ws_server;
+
   HttpServer *http_server;
-  
+
   std::string web_root_path_;
 
   std::thread http_server_thread;
-  std::thread ws_server_thread;
-  bool ws_server_started=false;
 
   int RunServer();
   int Close();
   void PrintHelp();
-  void SendMessage();
 
   Server();
   virtual ~Server();
 
  private:
   void RunHttpServer();
-  void RunWsServer();
 };
 
 }  // namespace traffic_monitor

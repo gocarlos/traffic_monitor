@@ -20,7 +20,10 @@ This app can be used to count the amount of traffic on a street. Its available a
 # Project status
 This is still under development and not ready as plug and play, will happen in the next few days. Check in a few days again :smile:
 
+[![Build Status](https://travis-ci.org/vigilatore/traffic_monitor.svg?branch=master)](https://travis-ci.org/vigilatore/traffic_monitor)
+
 [![Build Status](https://travis-ci.org/gocarlos/traffic_monitor.svg?branch=master)](https://travis-ci.org/gocarlos/traffic_monitor)
+
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)  
 

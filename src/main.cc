@@ -22,15 +22,17 @@ void inthand(int signum) {
 }
 
 int main(int argc, char *argv[]) {
-  //  google::InitGoogleLogging(argv[0]); does nothing, as we use miniglog
+  google::InitGoogleLogging(argv[0]);
   signal(SIGINT, inthand);
 
   cxxopts::Options options("Traffic Monitor", "todo: longer app description");
 
   // clang-format off
-	options.add_options()("d,debug", "Enable debugging")("g,withgui",
-			"Enable gui")("l,logfile", "Logging file name",
-			cxxopts::value<std::string>());
+	options.add_options()
+                        ("d,debug", "Enable debugging")
+                        ("g,withgui", "Enable gui")
+                        ("l,logfile", "Logging file name",
+			                  cxxopts::value<std::string>());
   // clang-format on
 
   options.parse(argc, argv);
@@ -54,11 +56,6 @@ int main(int argc, char *argv[]) {
 
   // Start the web server.
   server.RunServer();
-
-  while (true) {
-    sleep(2);
-    server.SendMessage();
-  };
 
   // Close the web server.
   tracker_thread.join();
