@@ -27,9 +27,7 @@ namespace traffic_monitor {
 
 using namespace boost::property_tree;
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
-// typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
-// typedef SimpleWeb::SocketServer<SimpleWeb::WS> WsServer;
-// typedef SimpleWeb::SocketClient<SimpleWeb::WS> WsClient;
+
 using namespace std;
 
 class Server {
@@ -43,7 +41,6 @@ class Server {
 
   int RunServer();
   int Close();
-  void PrintHelp();
 
   Server();
   virtual ~Server();

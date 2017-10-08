@@ -5,7 +5,7 @@
 namespace traffic_monitor {
 
 Server::Server() {
-  
+
   http_server = new HttpServer;
   http_server->config.port = Settings::http_server_port_;
 
@@ -33,13 +33,6 @@ Server::~Server() {
   http_server = nullptr;
 
   LOG(INFO) << "Destructing the server.";
-}
-
-void Server::PrintHelp() {
-  // clang-format off
-  std::cout << "The activity on the street is streamed to the page: http://localhost:8080." << std::endl;
-  std::cout << "You can view statistics and adjust some settings. "<< std::endl;
-  // clang-format on
 }
 
 void Server::RunHttpServer() {
@@ -114,8 +107,10 @@ void Server::RunHttpServer() {
   };
 
   http_server_thread = std::thread([&]() {
-    // Start server
-    LOG(INFO) << "Webserver started";
+    // clang-format off
+    LOG(INFO) << "The activity on the street is streamed to the page: http://localhost:8080." << std::endl;
+    LOG(INFO) << "You can view statistics and adjust some settings. "<< std::endl;
+    // clang-format on
     http_server->start();
   });
 }
