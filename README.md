@@ -41,14 +41,21 @@ This is still under development and not ready as plug and play, will happen in t
 # clone app
 git clone git@github.com/vigilatore/traffic_monitor.git
 cd traffic_monitor
+# clone submodules
+git submodule init
+git submodule update
+# build
 mkdir build
 cd build
 cmake ..
 make
+# start
 ./traffic_monitor
 ```
 
 ## Install instructions:
+
+This app is also available as snap app for linux computers.
 
 ```bash
 sudo snap install traffic-monitor --devmode # Currently in devmode, will be corrected soon.
